@@ -11,7 +11,6 @@ interface RotatingEarthProps {
 
 export default function RotatingEarth({ width = 800, height = 600, className = "" }: RotatingEarthProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -43,6 +42,9 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     const path = d3.geoPath().projection(projection).context(context)
 
     let landFeatures: any
+    const graticule = d3.geoGraticule()()
+    let animationProgress = 0
+    const animationDuration = 120 // frames (~2 seconds)
 
     const render = () => {
       // Clear canvas
@@ -50,10 +52,12 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
 
       const currentScale = projection.scale()
       const scaleFactor = currentScale / radius
+      const centerX = containerWidth / 2
+      const centerY = containerHeight / 2
 
       // Draw ocean (globe background)
       context.beginPath()
-      context.arc(containerWidth / 2, containerHeight / 2, currentScale, 0, 2 * Math.PI)
+      context.arc(centerX, centerY, currentScale, 0, 2 * Math.PI)
       context.fillStyle = "#000000"
       context.fill()
       context.strokeStyle = "#ffffff"
@@ -61,15 +65,31 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       context.stroke()
 
       if (landFeatures) {
-        // Draw graticule
-        const graticule = d3.geoGraticule()
-        context.beginPath()
-        path(graticule())
-        context.strokeStyle = "#ffffff"
-        context.lineWidth = 1 * scaleFactor
-        context.globalAlpha = 0.25
-        context.stroke()
-        context.globalAlpha = 1
+        // Draw graticule with reveal animation
+        if (animationProgress > 0) {
+          const progress = Math.min(animationProgress / animationDuration, 1)
+          const eased = 1 - Math.pow(1 - progress, 3) // ease out cubic
+          
+          context.save()
+          
+          // Create clip path that reveals from top and bottom toward center
+          context.beginPath()
+          // Top strip - grows down from top
+          context.rect(0, 0, containerWidth, centerY * eased)
+          // Bottom strip - grows up from bottom
+          context.rect(0, containerHeight - centerY * eased, containerWidth, centerY * eased)
+          context.clip()
+          
+          context.beginPath()
+          path(graticule)
+          context.strokeStyle = "#ffffff"
+          context.lineWidth = 1 * scaleFactor
+          context.globalAlpha = 0.25
+          context.stroke()
+          context.globalAlpha = 1
+          
+          context.restore()
+        }
 
         // Fill land to cover grid inside countries
         context.beginPath()
@@ -88,22 +108,20 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
         context.lineWidth = 1 * scaleFactor
         context.stroke()
       }
+      
+      if (animationProgress < animationDuration) {
+        animationProgress++
+      }
     }
 
     const loadWorldData = async () => {
       try {
-        setIsLoading(true)
-
         const response = await fetch("/land.json")
         if (!response.ok) throw new Error("Failed to load land data")
 
         landFeatures = await response.json()
-
-        render()
-        setIsLoading(false)
       } catch (err) {
         setError("Failed to load land map data")
-        setIsLoading(false)
       }
     }
 
@@ -120,9 +138,17 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
 
     // Load the world data
     loadWorldData().then(() => {
-      // Only start rotation after data is loaded
-      canvas.style.opacity = "1"
-      rotationTimer = d3.timer(rotate)
+      // Double requestAnimationFrame to ensure paint is complete
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          render()
+          canvas.style.opacity = "1"
+          // Small delay before starting animation
+          setTimeout(() => {
+            rotationTimer = d3.timer(rotate)
+          }, 50)
+        })
+      })
     })
 
     // Cleanup
