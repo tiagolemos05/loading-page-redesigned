@@ -10,7 +10,7 @@ export function HeroSection() {
       className="flex flex-col items-center text-center relative mx-auto rounded-2xl overflow-hidden my-6 py-0 px-4
          w-full h-[750px] md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0"
     >
-      {/* CSS Grid Background - much lighter than 770 SVG rects */}
+      {/* CSS Grid Background - top */}
       <div 
         className="absolute inset-0 z-0 opacity-[0.07]"
         style={{
@@ -21,6 +21,20 @@ export function HeroSection() {
           backgroundSize: '36px 36px',
           maskImage: 'linear-gradient(to bottom, black 0%, transparent 70%)',
           WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 70%)',
+        }}
+      />
+
+      {/* CSS Grid Background - bottom */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-[150px] z-0 opacity-[0.04]"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
+            linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)
+          `,
+          backgroundSize: '36px 36px',
+          maskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
         }}
       />
       
