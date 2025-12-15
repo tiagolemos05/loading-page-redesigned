@@ -18,7 +18,7 @@ const BentoCard = ({ title, description, Component }) => (
         </p>
       </div>
     </div>
-    <div className="self-stretch h-72 relative -mt-0.5 z-10">
+    <div className="self-stretch h-96 relative -mt-0.5 z-10">
       <Component />
     </div>
   </div>
