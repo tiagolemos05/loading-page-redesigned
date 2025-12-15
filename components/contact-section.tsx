@@ -52,11 +52,40 @@ export function ContactSection() {
   }
 
   return (
-    <section className="w-full px-5 py-16 md:py-24">
-      <div className="max-w-[600px] mx-auto">
+    <section className="w-full px-5 py-16 md:py-24 relative">
+      {/* Wave separator with glow */}
+      <div className="absolute top-0 left-0 right-0 h-[200px] overflow-hidden">
+        {/* Wave shape - solid background */}
+        <div 
+          className="absolute top-0 left-0 right-0 h-[100px] z-20"
+          style={{
+            backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="M0 0v4c250 0 250 96 500 96S750 4 1000 4V0H0Z" fill="%230f1211"></path></svg>')`,
+            backgroundSize: '100% 100%',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        {/* Subtle edge highlight - only visible in center */}
+        <div 
+          className="absolute top-0 left-0 right-0 h-[100px] z-30 pointer-events-none"
+          style={{
+            backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><defs><linearGradient id="fadeGrad" x1="0%25" y1="0%25" x2="100%25" y2="0%25"><stop offset="0%25" stop-color="white" stop-opacity="0"/><stop offset="35%25" stop-color="white" stop-opacity="0.15"/><stop offset="50%25" stop-color="white" stop-opacity="0.2"/><stop offset="65%25" stop-color="white" stop-opacity="0.15"/><stop offset="100%25" stop-color="white" stop-opacity="0"/></linearGradient></defs><path d="M0 4c250 0 250 96 500 96S750 4 1000 4" fill="none" stroke="url(%23fadeGrad)" stroke-width="1"></path></svg>')`,
+            backgroundSize: '100% 100%',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        {/* Glow - clipped by overflow hidden, positioned to only show below wave */}
+        <div 
+          className="absolute top-[100px] left-1/2 -translate-x-1/2 w-[800px] h-[90px] opacity-20 blur-[50px] z-10"
+          style={{
+            background: 'radial-gradient(ellipse at center top, hsl(var(--primary)) 0%, transparent 65%)',
+          }}
+        />
+      </div>
+
+      <div className="max-w-[600px] mx-auto pt-[80px]">
         <div className="text-center mb-10">
           <h2 className="text-foreground text-4xl md:text-5xl font-semibold mb-4">
-            Let's Talk AI
+            Ready to Automate your Business?
           </h2>
           <p className="text-muted-foreground text-lg">
             Tell us about your project and we'll show you what's possible.
