@@ -8,7 +8,7 @@ export function HeroSection() {
   return (
     <section
       className="flex flex-col items-center text-center relative mx-auto rounded-2xl overflow-hidden my-6 py-0 px-4
-         w-full h-[700px] md:w-[1220px] md:h-[900px] lg:h-[1100px] md:px-0"
+         w-full h-[750px] md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0"
     >
       {/* CSS Grid Background - much lighter than 770 SVG rects */}
       <div 
@@ -58,6 +58,7 @@ export function HeroSection() {
 
       <div className="relative z-10 mt-8 md:mt-12 w-full max-w-[600px] lg:max-w-[700px]">
         <RotatingEarth width={700} height={500} className="mx-auto" />
+        <p className="text-center text-muted-foreground text-base md:text-lg mt-4">Based in Europe, automating worldwide</p>
       </div>
     </section>
   )
