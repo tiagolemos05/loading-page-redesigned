@@ -42,88 +42,6 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
 
     const path = d3.geoPath().projection(projection).context(context)
 
-    const pointInPolygon = (point: [number, number], polygon: number[][]): boolean => {
-      const [x, y] = point
-      let inside = false
-
-      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-        const [xi, yi] = polygon[i]
-        const [xj, yj] = polygon[j]
-
-        if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
-          inside = !inside
-        }
-      }
-
-      return inside
-    }
-
-    const pointInFeature = (point: [number, number], feature: any): boolean => {
-      const geometry = feature.geometry
-
-      if (geometry.type === "Polygon") {
-        const coordinates = geometry.coordinates
-        // Check if point is in outer ring
-        if (!pointInPolygon(point, coordinates[0])) {
-          return false
-        }
-        // Check if point is in any hole (inner rings)
-        for (let i = 1; i < coordinates.length; i++) {
-          if (pointInPolygon(point, coordinates[i])) {
-            return false // Point is in a hole
-          }
-        }
-        return true
-      } else if (geometry.type === "MultiPolygon") {
-        // Check each polygon in the MultiPolygon
-        for (const polygon of geometry.coordinates) {
-          // Check if point is in outer ring
-          if (pointInPolygon(point, polygon[0])) {
-            // Check if point is in any hole
-            let inHole = false
-            for (let i = 1; i < polygon.length; i++) {
-              if (pointInPolygon(point, polygon[i])) {
-                inHole = true
-                break
-              }
-            }
-            if (!inHole) {
-              return true
-            }
-          }
-        }
-        return false
-      }
-
-      return false
-    }
-
-    const generateDotsInPolygon = (feature: any, dotSpacing = 24) => {
-      const dots: [number, number][] = []
-      const bounds = d3.geoBounds(feature)
-      const [[minLng, minLat], [maxLng, maxLat]] = bounds
-
-      const stepSize = dotSpacing * 0.08
-
-      for (let lng = minLng; lng <= maxLng; lng += stepSize) {
-        for (let lat = minLat; lat <= maxLat; lat += stepSize) {
-          const point: [number, number] = [lng, lat]
-          if (pointInFeature(point, feature)) {
-            dots.push(point)
-          }
-        }
-      }
-
-      return dots
-    }
-
-    interface DotData {
-      lng: number
-      lat: number
-      visible: boolean
-    }
-
-    const allDots: DotData[] = []
     let landFeatures: any
 
     const render = () => {
@@ -153,6 +71,14 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
         context.stroke()
         context.globalAlpha = 1
 
+        // Fill land to cover grid inside countries
+        context.beginPath()
+        landFeatures.features.forEach((feature: any) => {
+          path(feature)
+        })
+        context.fillStyle = "#000000"
+        context.fill()
+
         // Draw land outlines
         context.beginPath()
         landFeatures.features.forEach((feature: any) => {
@@ -161,23 +87,6 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
         context.strokeStyle = "#ffffff"
         context.lineWidth = 1 * scaleFactor
         context.stroke()
-
-        // Draw halftone dots
-        allDots.forEach((dot) => {
-          const projected = projection([dot.lng, dot.lat])
-          if (
-            projected &&
-            projected[0] >= 0 &&
-            projected[0] <= containerWidth &&
-            projected[1] >= 0 &&
-            projected[1] <= containerHeight
-          ) {
-            context.beginPath()
-            context.arc(projected[0], projected[1], 1.2 * scaleFactor, 0, 2 * Math.PI)
-            context.fillStyle = "#999999"
-            context.fill()
-          }
-        })
       }
     }
 
@@ -189,14 +98,6 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
         if (!response.ok) throw new Error("Failed to load land data")
 
         landFeatures = await response.json()
-
-        // Generate dots for all land features
-        landFeatures.features.forEach((feature: any) => {
-          const dots = generateDotsInPolygon(feature, 24)
-          dots.forEach(([lng, lat]) => {
-            allDots.push({ lng, lat, visible: true })
-          })
-        })
 
         render()
         setIsLoading(false)
