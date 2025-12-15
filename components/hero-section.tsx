@@ -24,6 +24,20 @@ export function HeroSection() {
         }}
       />
 
+      {/* Filled grid squares - aligned to 36px grid, opacity increases left to right */}
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.04] top-[72px] left-[720px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.03] top-[144px] left-[180px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.09] top-[144px] left-[1008px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.02] top-[216px] left-[108px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.09] top-[216px] left-[1080px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.08] top-[288px] left-[936px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.03] top-[324px] left-[216px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.04] top-[396px] left-[288px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.02] top-[396px] left-[72px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.05] top-[396px] left-[504px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.07] top-[396px] left-[756px] hidden md:block" />
+      <div className="absolute w-[36px] h-[36px] bg-foreground/[0.05] top-[468px] left-[576px] hidden md:block" />
+
       {/* CSS Grid Background - bottom */}
       <div 
         className="absolute bottom-0 left-0 right-0 h-[150px] z-0 opacity-[0.04]"
