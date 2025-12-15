@@ -144,11 +144,18 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
 
   return (
     <div className={`relative ${className}`}>
-      <canvas
-        ref={canvasRef}
-        className="w-full h-auto rounded-2xl bg-background dark transition-opacity duration-1000 ease-in-out"
-        style={{ maxWidth: "100%", height: "auto", opacity: 0 }}
-      />
+      <div 
+        style={{ 
+          maskImage: 'radial-gradient(ellipse 80% 70% at center 45%, black 50%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at center 45%, black 50%, transparent 100%)',
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          className="w-full h-auto rounded-2xl bg-background dark transition-opacity duration-1000 ease-in-out"
+          style={{ maxWidth: "100%", height: "auto", opacity: 0 }}
+        />
+      </div>
     </div>
   )
 }

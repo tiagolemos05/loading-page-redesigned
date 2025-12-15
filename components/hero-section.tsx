@@ -37,6 +37,15 @@ export function HeroSection() {
           WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
         }}
       />
+
+      {/* Gradient blob - bottom */}
+      <div 
+        className="absolute bottom-0 left-1/2 w-[600px] h-[200px] opacity-10 blur-[80px] z-0"
+        style={{
+          background: 'radial-gradient(circle at center, hsl(var(--primary)) 0%, transparent 70%)',
+          transform: 'translate(-50%, 85%)',
+        }}
+      />
       
       {/* Gradient blob - simplified */}
       <div 
