@@ -98,28 +98,22 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       return false
     }
 
-    const generateDotsInPolygon = (feature: any, dotSpacing = 16) => {
+    const generateDotsInPolygon = (feature: any, dotSpacing = 24) => {
       const dots: [number, number][] = []
       const bounds = d3.geoBounds(feature)
       const [[minLng, minLat], [maxLng, maxLat]] = bounds
 
       const stepSize = dotSpacing * 0.08
-      let pointsGenerated = 0
 
       for (let lng = minLng; lng <= maxLng; lng += stepSize) {
         for (let lat = minLat; lat <= maxLat; lat += stepSize) {
           const point: [number, number] = [lng, lat]
           if (pointInFeature(point, feature)) {
             dots.push(point)
-            pointsGenerated++
           }
         }
       }
 
-      console.log(
-        `[v0] Generated ${pointsGenerated} points for land feature:`,
-        feature.properties?.featurecla || "Land",
-      )
       return dots
     }
 
@@ -191,24 +185,18 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       try {
         setIsLoading(true)
 
-        const response = await fetch(
-          "https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/110m/physical/ne_110m_land.json",
-        )
+        const response = await fetch("/land.json")
         if (!response.ok) throw new Error("Failed to load land data")
 
         landFeatures = await response.json()
 
         // Generate dots for all land features
-        let totalDots = 0
         landFeatures.features.forEach((feature: any) => {
-          const dots = generateDotsInPolygon(feature, 16)
+          const dots = generateDotsInPolygon(feature, 24)
           dots.forEach(([lng, lat]) => {
             allDots.push({ lng, lat, visible: true })
-            totalDots++
           })
         })
-
-        console.log(`[v0] Total dots generated: ${totalDots} across ${landFeatures.features.length} land features`)
 
         render()
         setIsLoading(false)
@@ -218,73 +206,27 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       }
     }
 
-    // Set up rotation and interaction
+    // Set up rotation
     const rotation = [0, 0]
-    let autoRotate = true
     const rotationSpeed = 0.5
+    let rotationTimer: d3.Timer | null = null
 
     const rotate = () => {
-      if (autoRotate) {
-        rotation[0] += rotationSpeed
-        projection.rotate(rotation)
-        render()
-      }
-    }
-
-    // Auto-rotation timer
-    const rotationTimer = d3.timer(rotate)
-
-    const handleMouseDown = (event: MouseEvent) => {
-      autoRotate = false
-      const startX = event.clientX
-      const startY = event.clientY
-      const startRotation = [...rotation]
-
-      const handleMouseMove = (moveEvent: MouseEvent) => {
-        const sensitivity = 0.5
-        const dx = moveEvent.clientX - startX
-        const dy = moveEvent.clientY - startY
-
-        rotation[0] = startRotation[0] + dx * sensitivity
-        rotation[1] = startRotation[1] - dy * sensitivity
-        rotation[1] = Math.max(-90, Math.min(90, rotation[1]))
-
-        projection.rotate(rotation)
-        render()
-      }
-
-      const handleMouseUp = () => {
-        document.removeEventListener("mousemove", handleMouseMove)
-        document.removeEventListener("mouseup", handleMouseUp)
-
-        setTimeout(() => {
-          autoRotate = true
-        }, 10)
-      }
-
-      document.addEventListener("mousemove", handleMouseMove)
-      document.addEventListener("mouseup", handleMouseUp)
-    }
-
-    const handleWheel = (event: WheelEvent) => {
-      event.preventDefault()
-      const scaleFactor = event.deltaY > 0 ? 0.9 : 1.1
-      const newRadius = Math.max(radius * 0.5, Math.min(radius * 3, projection.scale() * scaleFactor))
-      projection.scale(newRadius)
+      rotation[0] += rotationSpeed
+      projection.rotate(rotation)
       render()
     }
 
-    canvas.addEventListener("mousedown", handleMouseDown)
-    canvas.addEventListener("wheel", handleWheel)
-
     // Load the world data
-    loadWorldData()
+    loadWorldData().then(() => {
+      // Only start rotation after data is loaded
+      canvas.style.opacity = "1"
+      rotationTimer = d3.timer(rotate)
+    })
 
     // Cleanup
     return () => {
-      rotationTimer.stop()
-      canvas.removeEventListener("mousedown", handleMouseDown)
-      canvas.removeEventListener("wheel", handleWheel)
+      rotationTimer?.stop()
     }
   }, [width, height])
 
@@ -303,12 +245,9 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     <div className={`relative ${className}`}>
       <canvas
         ref={canvasRef}
-        className="w-full h-auto rounded-2xl bg-background dark"
-        style={{ maxWidth: "100%", height: "auto" }}
+        className="w-full h-auto rounded-2xl bg-background dark transition-opacity duration-1000 ease-in-out"
+        style={{ maxWidth: "100%", height: "auto", opacity: 0 }}
       />
-      <div className="absolute bottom-4 left-4 text-xs text-muted-foreground px-2 py-1 rounded-md dark bg-neutral-900">
-        Drag to rotate • Scroll to zoom
-      </div>
     </div>
   )
 }

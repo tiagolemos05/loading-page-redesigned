@@ -2,12 +2,13 @@ import React from "react"
 import { Button } from "@/components/ui/button"
 import { Header } from "./header"
 import Link from "next/link"
+import RotatingEarth from "./rotating-earth"
 
 export function HeroSection() {
   return (
     <section
       className="flex flex-col items-center text-center relative mx-auto rounded-2xl overflow-hidden my-6 py-0 px-4
-         w-full h-[400px] md:w-[1220px] md:h-[600px] lg:h-[810px] md:px-0"
+         w-full h-[700px] md:w-[1220px] md:h-[900px] lg:h-[1100px] md:px-0"
     >
       {/* CSS Grid Background - much lighter than 770 SVG rects */}
       <div 
@@ -54,6 +55,10 @@ export function HeroSection() {
           Get Started
         </Button>
       </Link>
+
+      <div className="relative z-10 mt-8 md:mt-12 w-full max-w-[600px] lg:max-w-[700px]">
+        <RotatingEarth width={700} height={500} className="mx-auto" />
+      </div>
     </section>
   )
 }
