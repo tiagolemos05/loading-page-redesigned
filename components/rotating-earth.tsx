@@ -74,12 +74,11 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
           
           // Create clip path that reveals from top and bottom toward center
           context.beginPath()
-          // Top strip - grows down from top
           context.rect(0, 0, containerWidth, centerY * eased)
-          // Bottom strip - grows up from bottom
           context.rect(0, containerHeight - centerY * eased, containerWidth, centerY * eased)
           context.clip()
           
+          // Draw main graticule lines
           context.beginPath()
           path(graticule)
           context.strokeStyle = "#ffffff"
