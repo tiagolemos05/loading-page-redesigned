@@ -8,7 +8,7 @@ export function HeroSection() {
   return (
     <section
       className="flex flex-col items-center text-center relative mx-auto overflow-hidden py-0 px-4 contain-content
-         w-full h-[850px] md:rounded-2xl md:my-6 md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0"
+         w-full h-[680px] md:rounded-2xl md:my-6 md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0"
     >
       {/* CSS Grid Background - top */}
       <div 
@@ -125,11 +125,11 @@ export function HeroSection() {
         <Header />
       </div>
 
-      <div className="relative z-10 space-y-4 md:space-y-5 lg:space-y-6 mb-6 md:mb-7 lg:mb-9 max-w-md md:max-w-[800px] lg:max-w-[900px] mt-16 md:mt-[120px] lg:mt-[160px] px-4">
-        <h1 className="text-foreground text-3xl md:text-4xl lg:text-6xl font-semibold leading-tight max-w-md md:max-w-[500px] lg:max-w-[588px] mx-auto">
+      <div className="relative z-10 space-y-3 md:space-y-5 lg:space-y-6 mb-4 md:mb-7 lg:mb-9 max-w-md md:max-w-[800px] lg:max-w-[900px] mt-20 md:mt-[120px] lg:mt-[160px] px-4">
+        <h1 className="text-foreground text-2xl md:text-4xl lg:text-6xl font-semibold leading-tight max-w-md md:max-w-[500px] lg:max-w-[588px] mx-auto">
           Custom Automation for Your Business Operations
         </h1>
-        <p className="text-muted-foreground text-base md:text-base lg:text-lg font-medium leading-relaxed mx-auto">
+        <p className="text-muted-foreground text-sm md:text-base lg:text-lg font-medium leading-relaxed mx-auto">
           We build tailored automation solutions that streamline your internal processes. From Salesforce workflows to intelligent document handling, we solve the bottlenecks slowing your team down.
         </p>
       </div>
@@ -140,9 +140,9 @@ export function HeroSection() {
         </Button>
       </Link>
 
-      <div className="relative z-10 mt-8 md:mt-12 w-full max-w-[320px] md:max-w-[600px] lg:max-w-[700px] mx-auto">
+      <div className="relative z-10 mt-5 md:mt-12 w-[85vw] max-w-[320px] md:max-w-[600px] lg:max-w-[700px] mx-auto">
         <RotatingEarth width={700} height={500} className="mx-auto w-full" />
-        <p className="text-center text-muted-foreground text-sm md:text-base lg:text-lg mt-4">Based in Europe, automating worldwide</p>
+        <p className="text-center text-muted-foreground text-xs md:text-base lg:text-lg mt-2 md:mt-4">Based in Europe, automating worldwide</p>
       </div>
     </section>
   )

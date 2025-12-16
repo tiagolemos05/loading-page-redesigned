@@ -52,7 +52,7 @@ export function ContactSection() {
   }
 
   return (
-    <section className="w-full px-5 py-16 md:py-24 relative contain-content">
+    <section className="w-full px-5 py-10 md:py-24 relative contain-content">
       {/* Wave separator with glow */}
       <div className="absolute top-0 left-0 right-0 h-[200px] overflow-hidden">
         {/* Wave shape - solid background */}
@@ -82,12 +82,12 @@ export function ContactSection() {
         />
       </div>
 
-      <div className="max-w-[600px] mx-auto pt-[80px]">
+      <div className="max-w-[600px] mx-auto pt-[40px] md:pt-[80px]">
         <div className="text-center mb-8 md:mb-10">
-          <h2 className="text-foreground text-3xl md:text-4xl lg:text-5xl font-semibold mb-4">
+          <h2 className="text-foreground text-2xl md:text-4xl lg:text-5xl font-semibold mb-4">
             Ready to Streamline Your Operations?
           </h2>
-          <p className="text-muted-foreground text-base md:text-lg">
+          <p className="text-muted-foreground text-sm md:text-lg">
             Tell us about your workflow challenges and we'll show you what's possible.
           </p>
         </div>

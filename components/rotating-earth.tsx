@@ -32,15 +32,20 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
   }, [])
 
   useEffect(() => {
-    if (!canvasRef.current) return
+    if (!canvasRef.current || !containerRef.current) return
 
     const canvas = canvasRef.current
     const context = canvas.getContext("2d")
     if (!context) return
 
-    // Set up responsive dimensions
-    const containerWidth = Math.min(width, window.innerWidth - 40)
-    const containerHeight = Math.min(height, window.innerHeight - 100)
+    // Use actual container width for accurate sizing
+    const actualContainerWidth = containerRef.current.offsetWidth
+    const containerWidth = Math.min(width, actualContainerWidth || window.innerWidth - 40)
+    // On mobile (< 768px), make height proportional to width for square-ish globe
+    const isMobile = window.innerWidth < 768
+    const containerHeight = isMobile 
+      ? containerWidth * 0.9  // Slightly less than square to account for globe positioning
+      : Math.min(height, window.innerHeight - 100)
     const radius = Math.min(containerWidth, containerHeight) / 2.5
 
     // Cap DPR at 1.5 for performance (still looks good, much less pixels)
