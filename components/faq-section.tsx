@@ -21,7 +21,7 @@ const faqData = [
       "Yes, Salesforce integrations are one of our core strengths. We connect Salesforce to your other tools and build automated workflows that keep your data in sync, trigger actions based on CRM events, and eliminate manual data entry.",
   },
   {
-    question: "How long does it take to implement an automation?",
+    question: "How long does implementation take?",
     answer:
       "Implementation timelines vary based on complexity. Simple automations can be deployed within 1-2 weeks, while more complex custom workflows may take 4-8 weeks. We'll provide a detailed timeline during our initial consultation.",
   },
@@ -54,11 +54,11 @@ const FAQItem = ({ question, answer, isOpen, onToggle }: FAQItemProps) => {
       className={`w-full bg-[rgba(231,236,235,0.08)] shadow-[0px_2px_4px_rgba(0,0,0,0.16)] overflow-hidden rounded-[10px] outline outline-1 outline-border outline-offset-[-1px] cursor-pointer`}
       onClick={handleClick}
     >
-      <div className="w-full px-5 py-[18px] pr-4 flex justify-between items-center gap-5 text-left">
-        <div className="flex-1 text-foreground text-base font-medium leading-6 break-words">{question}</div>
+      <div className="w-full px-4 md:px-5 py-3 md:py-[18px] pr-3 md:pr-4 flex justify-between items-center gap-3 md:gap-5 text-left">
+        <div className="flex-1 text-foreground text-[10px] min-[340px]:text-sm md:text-base font-medium leading-4 min-[340px]:leading-5 md:leading-6 break-words">{question}</div>
         <div className="flex justify-center items-center">
           <ChevronDown
-            className={`w-6 h-6 text-muted-foreground-dark transition-transform duration-300 ease-out ${isOpen ? "rotate-180" : "rotate-0"}`}
+            className={`w-5 h-5 md:w-6 md:h-6 text-muted-foreground-dark transition-transform duration-300 ease-out ${isOpen ? "rotate-180" : "rotate-0"}`}
           />
         </div>
       </div>
@@ -69,8 +69,8 @@ const FAQItem = ({ question, answer, isOpen, onToggle }: FAQItemProps) => {
         }}
       >
         <div className="overflow-hidden">
-          <div className="px-5 pb-[18px] pt-2">
-            <div className="text-foreground/80 text-sm font-normal leading-6 break-words">{answer}</div>
+          <div className="px-4 md:px-5 pb-3 md:pb-[18px] pt-1 md:pt-2">
+            <div className="text-foreground/80 text-[11px] min-[340px]:text-xs md:text-sm font-normal leading-4 min-[340px]:leading-5 md:leading-6 break-words">{answer}</div>
           </div>
         </div>
       </div>
