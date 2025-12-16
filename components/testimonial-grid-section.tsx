@@ -150,8 +150,8 @@ export function TestimonialGridSection() {
       </div>
       
       {/* Mobile: Horizontal scroll carousel */}
-      <div className="md:hidden w-full overflow-x-auto pb-4 -mx-5 px-5 scrollbar-hide">
-        <div className="flex gap-3 w-max">
+      <div className="md:hidden w-screen relative left-1/2 -translate-x-1/2 overflow-x-auto pb-4 px-5 scrollbar-hide">
+        <div className="flex gap-3 w-max pr-5">
           {testimonials.map((testimonial, index) => (
             <TestimonialCard key={index} {...testimonial} isMobile={true} />
           ))}

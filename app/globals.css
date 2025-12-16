@@ -54,6 +54,18 @@
     font-size: 16px;
   }
   
+  /* Hide scrollbar on mobile */
+  @media (max-width: 768px) {
+    html, body {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
   /* Scale down text for smaller mobile screens */
   @media (max-width: 390px) {
     html {

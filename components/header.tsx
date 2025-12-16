@@ -1,13 +1,16 @@
 "use client"
 
 import type React from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
-import Link from "next/link" // Import Link for client-side navigation
+import Link from "next/link"
 
 export function Header() {
+  const [isOpen, setIsOpen] = useState(false)
+
   const navItems = [
     { name: "Services", href: "#features-section" },
     { name: "Contact", href: "#contact-section" },
@@ -15,10 +18,18 @@ export function Header() {
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
-    const targetId = href.substring(1) // Remove '#' from href
+    const targetId = href.substring(1)
     const targetElement = document.getElementById(targetId)
+    
     if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth" })
+      const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY
+      
+      setIsOpen(false)
+      
+      // Wait for sheet to fully close before scrolling
+      setTimeout(() => {
+        window.scrollTo({ top: targetPosition, behavior: "smooth" })
+      }, 300)
     }
   }
 
@@ -34,7 +45,7 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                onClick={(e) => handleScroll(e, item.href)} // Add onClick handler
+                onClick={(e) => handleScroll(e, item.href)}
                 className="text-[#888888] hover:text-foreground px-4 py-2 rounded-full font-medium transition-colors"
               >
                 {item.name}
@@ -48,7 +59,7 @@ export function Header() {
               Get Started
             </Button>
           </Link>
-          <Sheet>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="icon" className="text-foreground">
                 <Menu className="h-7 w-7" />
@@ -64,13 +75,13 @@ export function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={(e) => handleScroll(e, item.href)} // Add onClick handler
+                    onClick={(e) => handleScroll(e, item.href)}
                     className="text-[#888888] hover:text-foreground justify-start text-lg py-2"
                   >
                     {item.name}
                   </Link>
                 ))}
-                <Link href="#contact-section" className="w-full mt-4">
+                <Link href="#contact-section" onClick={(e) => handleScroll(e, "#contact-section")} className="w-full mt-4">
                   <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 px-6 py-2 rounded-full font-medium shadow-sm">
                     Get Started
                   </Button>

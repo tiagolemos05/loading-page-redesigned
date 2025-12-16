@@ -52,7 +52,8 @@ export function FooterSection() {
               Contact
             </a>
             <a href="mailto:tiagolemos@nodewave.io" className="text-foreground text-sm font-normal leading-5 hover:underline">
-              tiagolemos@nodewave.io
+              <span className="min-[400px]:hidden">Email</span>
+              <span className="hidden min-[400px]:inline">tiagolemos@nodewave.io</span>
             </a>
           </div>
         </div>
