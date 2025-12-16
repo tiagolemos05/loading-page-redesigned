@@ -22,7 +22,7 @@ export function ContactSection() {
 
     try {
       const response = await fetch(
-        "https://n8n.srv837090.hstgr.cloud/webhook/d03bdcd6-4559-42bc-bdca-36a0822edfa6",
+        "https://n8n.srv837090.hstgr.cloud/webhook/nodewave.io",
         {
           method: "POST",
           headers: {
