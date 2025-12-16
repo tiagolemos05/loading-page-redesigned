@@ -8,7 +8,7 @@ export function HeroSection() {
   return (
     <section
       className="flex flex-col items-center text-center relative mx-auto overflow-hidden py-0 px-4 contain-content
-         w-full h-[680px] md:rounded-2xl md:my-6 md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0"
+         w-full pb-12 md:rounded-2xl md:my-6 md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0 md:pb-0"
     >
       {/* CSS Grid Background - top */}
       <div 

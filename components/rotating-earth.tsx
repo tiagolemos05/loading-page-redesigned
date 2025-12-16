@@ -194,8 +194,16 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
   }
 
   return (
-    <div ref={containerRef} className={`relative ${className}`} style={{ willChange: "transform", transform: "translateZ(0)" }}>
+    <div 
+      ref={containerRef} 
+      className={`relative aspect-[1/0.9] md:aspect-auto ${className}`} 
+      style={{ 
+        willChange: "transform", 
+        transform: "translateZ(0)",
+      }}
+    >
       <div 
+        className="absolute inset-0 md:relative"
         style={{ 
           maskImage: 'radial-gradient(circle at center 50%, black 52%, transparent 58%)',
           WebkitMaskImage: 'radial-gradient(circle at center 50%, black 52%, transparent 58%)',
@@ -204,10 +212,9 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
       >
         <canvas
           ref={canvasRef}
-          className="w-full h-auto rounded-2xl transition-opacity duration-1000 ease-in-out"
+          className="w-full h-full md:h-auto rounded-2xl transition-opacity duration-1000 ease-in-out"
           style={{ 
             maxWidth: "100%", 
-            height: "auto", 
             opacity: 0,
             willChange: "contents",
             transform: "translateZ(0)",
