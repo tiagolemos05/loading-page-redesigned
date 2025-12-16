@@ -104,17 +104,14 @@ export function ContactSection() {
             <div className="relative z-10 text-center py-6 md:py-8">
               <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-full bg-primary/20 flex items-center justify-center">
                 <svg
-                  className="w-6 h-6 md:w-8 md:h-8 text-primary"
+                  xmlns="http://www.w3.org/2000/svg"
                   fill="none"
-                  stroke="currentColor"
                   viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-6 h-6 md:w-8 md:h-8 text-primary"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
               </div>
               <h3 className="text-foreground text-lg md:text-xl font-semibold mb-2">
