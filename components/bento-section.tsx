@@ -1,33 +1,59 @@
+"use client"
+
+import { useState } from "react"
 import AiCodeReviews from "./bento/ai-code-reviews"
 import RealtimeCodingPreviews from "./bento/real-time-previews"
 import OneClickIntegrationsIllustration from "./bento/one-click-integrations-illustration"
-import MCPConnectivityIllustration from "./bento/mcp-connectivity-illustration" // Updated import
+import MCPConnectivityIllustration from "./bento/mcp-connectivity-illustration"
 import EasyDeployment from "./bento/easy-deployment"
-import ParallelCodingAgents from "./bento/parallel-agents" // Updated import
+import ParallelCodingAgents from "./bento/parallel-agents"
+import { ChevronDown, ChevronUp } from "lucide-react"
 
-const BentoCard = ({ title, description, Component }) => (
-  <div className="overflow-hidden rounded-2xl border border-white/20 flex flex-col justify-start items-start relative bg-[rgba(20,20,22,0.8)]">
-    {/* Simple gradient overlay instead of backdrop-filter */}
-    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl" />
-
-    <div className="self-stretch p-6 flex flex-col justify-start items-start gap-2 relative z-10">
-      <div className="self-stretch flex flex-col justify-start items-start gap-1.5">
-        <p className="self-stretch text-foreground text-base md:text-lg font-normal leading-6 md:leading-7">
-          {title} <br />
-          <span className="text-muted-foreground">{description}</span>
-        </p>
+const BentoCard = ({ title, description, Component, mobileScale = 0.35 }) => (
+  <>
+    {/* Mobile: Horizontal layout */}
+    <div className="md:hidden overflow-hidden rounded-2xl border border-white/20 flex flex-row items-stretch relative bg-[rgba(20,20,22,0.8)]">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl" />
+      
+      <div className="flex-1 p-4 flex flex-col justify-center gap-1 relative z-10">
+        <p className="text-foreground text-sm font-medium leading-5">{title}</p>
+        <p className="text-muted-foreground text-xs leading-4">{description}</p>
+      </div>
+      
+      <div className="w-28 h-28 relative z-10 flex-shrink-0 overflow-hidden">
+        <div className="absolute inset-0 origin-top-left" style={{ transform: `scale(${mobileScale})` }}>
+          <div className="w-[320px] h-[320px]">
+            <Component />
+          </div>
+        </div>
       </div>
     </div>
-    <div className="self-stretch h-64 md:h-96 relative -mt-0.5 z-10">
-      <Component />
+
+    {/* Desktop: Vertical layout */}
+    <div className="hidden md:flex overflow-hidden rounded-2xl border border-white/20 flex-col justify-start items-start relative bg-[rgba(20,20,22,0.8)]">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl" />
+
+      <div className="self-stretch p-6 flex flex-col justify-start items-start gap-2 relative z-10">
+        <div className="self-stretch flex flex-col justify-start items-start gap-1.5">
+          <p className="self-stretch text-foreground text-lg font-normal leading-7">
+            {title} <br />
+            <span className="text-muted-foreground text-base">{description}</span>
+          </p>
+        </div>
+      </div>
+      <div className="self-stretch h-96 relative -mt-0.5 z-10">
+        <Component />
+      </div>
     </div>
-  </div>
+  </>
 )
 
 export function BentoSection() {
+  const [expanded, setExpanded] = useState(false)
+
   const cards = [
     {
-      title: "Process Automation.",
+      title: "Process Automation",
       description: "Streamline internal workflows like license creation, approvals, and document generation.",
       Component: AiCodeReviews,
     },
@@ -40,19 +66,20 @@ export function BentoSection() {
       title: "Email & Inbox Management",
       description: "Consolidate project emails, remove duplicates, and prioritize what matters.",
       Component: OneClickIntegrationsIllustration,
+      mobileScale: 0.28,
     },
     {
       title: "Meeting Documentation",
       description: "Automatically compile meeting notes into structured, actionable documents.",
-      Component: MCPConnectivityIllustration, // Updated component
+      Component: MCPConnectivityIllustration,
     },
     {
-      title: "Outreach & Lead Qualification", // Swapped position
+      title: "Outreach & Lead Qualification",
       description: "Automate prospect outreach, meeting reminders, and intelligent lead scoring.",
-      Component: ParallelCodingAgents, // Updated component
+      Component: ParallelCodingAgents,
     },
     {
-      title: "Custom n8n Workflows", // Swapped position
+      title: "Custom n8n Workflows",
       description: "Bespoke automation solutions built around your specific business needs.",
       Component: EasyDeployment,
     },
@@ -72,7 +99,34 @@ export function BentoSection() {
             </p>
           </div>
         </div>
-        <div className="self-stretch grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 z-10">
+        
+        {/* Mobile: Single column with expand/collapse */}
+        <div className="md:hidden self-stretch flex flex-col gap-3 z-10">
+          {(expanded ? cards : cards.slice(0, 3)).map((card) => (
+            <BentoCard key={card.title} {...card} />
+          ))}
+        </div>
+
+        {/* Expand/Collapse button - only on mobile */}
+        <div className="w-full flex justify-center z-10 md:hidden">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 bg-[rgba(20,20,22,0.8)] text-foreground text-sm font-medium focus:outline-none focus:ring-0 active:outline-none"
+          >
+            {expanded ? (
+              <>
+                Show Less <ChevronUp className="w-4 h-4" />
+              </>
+            ) : (
+              <>
+                Show More <ChevronDown className="w-4 h-4" />
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Desktop: Show all 6 cards */}
+        <div className="hidden md:grid self-stretch grid-cols-2 lg:grid-cols-3 gap-6 z-10">
           {cards.map((card) => (
             <BentoCard key={card.title} {...card} />
           ))}
