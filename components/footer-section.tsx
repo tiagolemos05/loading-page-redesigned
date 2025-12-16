@@ -10,7 +10,7 @@ export function FooterSection() {
         <div className="flex gap-3 items-stretch justify-center">
           <div className="text-center text-foreground text-xl font-semibold leading-4">Node Wave</div>
         </div>
-        <p className="text-foreground/90 text-sm font-medium leading-[18px] text-left">AI automation that scales</p>
+        <p className="text-foreground/90 text-sm font-medium leading-[18px] text-left">Custom automation solutions</p>
         <div className="flex justify-start items-start gap-3">
           <a href="#" aria-label="Twitter" className="w-4 h-4 flex items-center justify-center">
             <Twitter className="w-full h-full text-muted-foreground" />
@@ -29,16 +29,16 @@ export function FooterSection() {
           <h3 className="text-muted-foreground text-sm font-medium leading-5">Services</h3>
           <div className="flex flex-col justify-end items-start gap-2">
             <a href="#features-section" className="text-foreground text-sm font-normal leading-5 hover:underline">
-              AI Lead Generation
+              Process Automation
             </a>
             <a href="#features-section" className="text-foreground text-sm font-normal leading-5 hover:underline">
-              AI Voice Agents
+              Salesforce Integrations
             </a>
             <a href="#features-section" className="text-foreground text-sm font-normal leading-5 hover:underline">
-              AI Chatbots
+              Email Management
             </a>
             <a href="#features-section" className="text-foreground text-sm font-normal leading-5 hover:underline">
-              Custom Automations
+              Custom n8n Workflows
             </a>
           </div>
         </div>

@@ -7,24 +7,57 @@ import RotatingEarth from "./rotating-earth"
 export function HeroSection() {
   return (
     <section
-      className="flex flex-col items-center text-center relative mx-auto rounded-2xl overflow-hidden my-6 py-0 px-4 contain-content
-         w-full h-[750px] md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0"
+      className="flex flex-col items-center text-center relative mx-auto overflow-hidden py-0 px-4 contain-content
+         w-full h-[850px] md:rounded-2xl md:my-6 md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0"
     >
       {/* CSS Grid Background - top */}
       <div 
         className="absolute inset-0 z-0 opacity-[0.07]"
         style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
-            linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)
-          `,
-          backgroundSize: '36px 36px',
-          maskImage: 'linear-gradient(to bottom, black 0%, transparent 70%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 70%)',
+          backgroundSize: '24px 24px',
         }}
-      />
+      >
+        <div 
+          className="absolute inset-0 md:hidden"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
+              linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px',
+            maskImage: 'linear-gradient(to bottom, black 0%, transparent 70%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 70%)',
+          }}
+        />
+        <div 
+          className="absolute inset-0 hidden md:block"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
+              linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)
+            `,
+            backgroundSize: '36px 36px',
+            maskImage: 'linear-gradient(to bottom, black 0%, transparent 70%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 70%)',
+          }}
+        />
+      </div>
 
-      {/* Filled grid squares - aligned to 36px grid, opacity increases left to right */}
+      {/* Filled grid squares - mobile positions (24px grid, opacity higher near top-right light source) */}
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.08] top-[48px] left-[288px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.03] top-[72px] left-[24px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.07] top-[96px] left-[264px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.04] top-[120px] left-[144px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.02] top-[168px] left-[48px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.05] top-[192px] left-[312px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.03] top-[240px] left-[192px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.06] top-[264px] left-[96px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.04] top-[288px] left-[264px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.02] top-[336px] left-[72px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.03] top-[360px] left-[216px] md:hidden" />
+      <div className="absolute w-[24px] h-[24px] bg-foreground/[0.04] top-[408px] left-[144px] md:hidden" />
+
+      {/* Filled grid squares - desktop positions */}
       <div className="absolute w-[36px] h-[36px] bg-foreground/[0.04] top-[72px] left-[720px] hidden md:block" />
       <div className="absolute w-[36px] h-[36px] bg-foreground/[0.03] top-[144px] left-[180px] hidden md:block" />
       <div className="absolute w-[36px] h-[36px] bg-foreground/[0.09] top-[144px] left-[1008px] hidden md:block" />
@@ -39,18 +72,32 @@ export function HeroSection() {
       <div className="absolute w-[36px] h-[36px] bg-foreground/[0.05] top-[468px] left-[576px] hidden md:block" />
 
       {/* CSS Grid Background - bottom */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 h-[150px] z-0 opacity-[0.04]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
-            linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)
-          `,
-          backgroundSize: '36px 36px',
-          maskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
-        }}
-      />
+      <div className="absolute bottom-0 left-0 right-0 h-[150px] z-0 opacity-[0.04]">
+        <div 
+          className="absolute inset-0 md:hidden"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
+              linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px',
+            maskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
+          }}
+        />
+        <div 
+          className="absolute inset-0 hidden md:block"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
+              linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)
+            `,
+            backgroundSize: '36px 36px',
+            maskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
+          }}
+        />
+      </div>
 
       {/* Gradient blob - bottom */}
       <div 
@@ -70,8 +117,8 @@ export function HeroSection() {
         }}
       />
 
-      {/* Border */}
-      <div className="absolute inset-0 rounded-2xl border border-foreground/[0.06] z-0" />
+      {/* Border - hidden on mobile */}
+      <div className="absolute inset-0 rounded-2xl border border-foreground/[0.06] z-0 hidden md:block" />
 
       {/* Header positioned at top of hero container */}
       <div className="absolute top-0 left-0 right-0 z-20">
@@ -93,9 +140,9 @@ export function HeroSection() {
         </Button>
       </Link>
 
-      <div className="relative z-10 mt-8 md:mt-12 w-full max-w-[600px] lg:max-w-[700px]">
-        <RotatingEarth width={700} height={500} className="mx-auto" />
-        <p className="text-center text-muted-foreground text-base md:text-lg mt-4">Based in Europe, automating worldwide</p>
+      <div className="relative z-10 mt-8 md:mt-12 w-full max-w-[320px] md:max-w-[600px] lg:max-w-[700px] mx-auto">
+        <RotatingEarth width={700} height={500} className="mx-auto w-full" />
+        <p className="text-center text-muted-foreground text-sm md:text-base lg:text-lg mt-4">Based in Europe, automating worldwide</p>
       </div>
     </section>
   )

@@ -83,17 +83,17 @@ export function ContactSection() {
       </div>
 
       <div className="max-w-[600px] mx-auto pt-[80px]">
-        <div className="text-center mb-10">
-          <h2 className="text-foreground text-4xl md:text-5xl font-semibold mb-4">
+        <div className="text-center mb-8 md:mb-10">
+          <h2 className="text-foreground text-3xl md:text-4xl lg:text-5xl font-semibold mb-4">
             Ready to Streamline Your Operations?
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base md:text-lg">
             Tell us about your workflow challenges and we'll show you what's possible.
           </p>
         </div>
 
         <div
-          className="rounded-2xl border border-white/20 p-8 relative overflow-hidden bg-[rgba(20,20,22,0.9)]"
+          className="rounded-2xl border border-white/20 p-5 md:p-8 relative overflow-hidden bg-[rgba(20,20,22,0.9)]"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl" />
 
