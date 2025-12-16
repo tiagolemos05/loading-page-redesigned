@@ -150,9 +150,8 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     let rotationTimer: d3.Timer | null = null
 
     const rotate = (elapsed: number) => {
-      if (!isVisibleRef.current) return // Skip rotation when not visible
+      if (!isVisibleRef.current) return // Skip when not visible
       
-      // Throttle to 30fps
       if (elapsed - lastFrameTime < frameInterval) return
       lastFrameTime = elapsed
       
@@ -194,17 +193,24 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
   }
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative ${className}`} style={{ willChange: "transform", transform: "translateZ(0)" }}>
       <div 
         style={{ 
           maskImage: 'radial-gradient(ellipse 80% 70% at center 45%, black 50%, transparent 100%)',
           WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at center 45%, black 50%, transparent 100%)',
+          transform: "translateZ(0)",
         }}
       >
         <canvas
           ref={canvasRef}
           className="w-full h-auto rounded-2xl bg-background dark transition-opacity duration-1000 ease-in-out"
-          style={{ maxWidth: "100%", height: "auto", opacity: 0 }}
+          style={{ 
+            maxWidth: "100%", 
+            height: "auto", 
+            opacity: 0,
+            willChange: "contents",
+            transform: "translateZ(0)",
+          }}
         />
       </div>
     </div>
