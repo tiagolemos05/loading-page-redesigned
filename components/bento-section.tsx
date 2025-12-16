@@ -27,33 +27,33 @@ const BentoCard = ({ title, description, Component }) => (
 export function BentoSection() {
   const cards = [
     {
-      title: "AI Lead Generation.",
-      description: "Intelligent lead capture and qualification that works around the clock.",
+      title: "Process Automation.",
+      description: "Streamline internal workflows like license creation, approvals, and document generation.",
       Component: AiCodeReviews,
     },
     {
-      title: "AI Voice Agents",
-      description: "Natural conversation AI that handles appointments and support calls 24/7.",
+      title: "Salesforce Integrations",
+      description: "Connect your CRM to automated workflows for seamless data flow and operations.",
       Component: RealtimeCodingPreviews,
     },
     {
-      title: "AI Chatbots",
-      description: "Smart chatbots that engage visitors and convert them into customers.",
+      title: "Email & Inbox Management",
+      description: "Consolidate project emails, remove duplicates, and prioritize what matters.",
       Component: OneClickIntegrationsIllustration,
     },
     {
-      title: "Custom AI Automations",
-      description: "Bespoke AI workflows designed specifically for your business needs.",
+      title: "Meeting Documentation",
+      description: "Automatically compile meeting notes into structured, actionable documents.",
       Component: MCPConnectivityIllustration, // Updated component
     },
     {
-      title: "CRM Integration", // Swapped position
-      description: "Seamlessly connect your AI systems with your existing CRM and tools.",
+      title: "Outreach & Lead Qualification", // Swapped position
+      description: "Automate prospect outreach, meeting reminders, and intelligent lead scoring.",
       Component: ParallelCodingAgents, // Updated component
     },
     {
-      title: "24/7 Availability", // Swapped position
-      description: "Your AI systems never sleep, capturing opportunities around the clock.",
+      title: "Custom n8n Workflows", // Swapped position
+      description: "Bespoke automation solutions built around your specific business needs.",
       Component: EasyDeployment,
     },
   ]
@@ -65,10 +65,10 @@ export function BentoSection() {
         <div className="self-stretch py-8 md:py-14 flex flex-col justify-center items-center gap-2 z-10">
           <div className="flex flex-col justify-start items-center gap-4">
             <h2 className="w-full max-w-[655px] text-center text-foreground text-4xl md:text-6xl font-semibold leading-tight md:leading-[66px]">
-              AI Solutions That Scale
+              Solutions Built for Your Workflow
             </h2>
             <p className="w-full max-w-[600px] text-center text-muted-foreground text-lg md:text-xl font-medium leading-relaxed">
-              We build intelligent automation systems that transform how you work. From lead generation to customer support, our AI works 24/7.
+              We design automation systems tailored to your operations. From CRM integrations to document workflows, we eliminate the manual work holding your team back.
             </p>
           </div>
         </div>

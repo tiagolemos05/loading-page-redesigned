@@ -85,10 +85,10 @@ export function ContactSection() {
       <div className="max-w-[600px] mx-auto pt-[80px]">
         <div className="text-center mb-10">
           <h2 className="text-foreground text-4xl md:text-5xl font-semibold mb-4">
-            Ready to Automate your Business?
+            Ready to Streamline Your Operations?
           </h2>
           <p className="text-muted-foreground text-lg">
-            Tell us about your project and we'll show you what's possible.
+            Tell us about your workflow challenges and we'll show you what's possible.
           </p>
         </div>
 

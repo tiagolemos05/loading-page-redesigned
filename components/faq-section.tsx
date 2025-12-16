@@ -8,32 +8,32 @@ const faqData = [
   {
     question: "What is Node Wave and who is it for?",
     answer:
-      "Node Wave is an AI automation agency that builds intelligent systems for businesses looking to scale their operations. We specialize in AI lead generation, voice agents, chatbots, and custom automations for companies of all sizes who want to work smarter, not harder.",
+      "Node Wave is an automation agency that builds custom workflow solutions for businesses looking to streamline their operations. We specialize in internal process automation, Salesforce integrations, and tailored n8n workflows for companies who want to eliminate manual, repetitive work.",
   },
   {
-    question: "How does AI lead generation work?",
+    question: "What kind of processes can you automate?",
     answer:
-      "Our AI lead generation systems work 24/7 to identify, capture, and qualify potential customers. Using intelligent algorithms, we analyze visitor behavior, engage prospects with personalized interactions, and automatically score leads based on their likelihood to convert.",
+      "We automate internal workflows like document generation, license creation, email management, meeting note compilation, CRM data entry, lead qualification, and much more. If your team is doing something manually and repeatedly, there's a good chance we can automate it.",
   },
   {
-    question: "What can AI voice agents do for my business?",
+    question: "Do you work with Salesforce?",
     answer:
-      "AI voice agents can handle appointment scheduling, answer customer inquiries, provide support, and even make outbound calls. They sound natural, never need breaks, and can scale infinitely to handle peak call volumes without additional overhead.",
+      "Yes, Salesforce integrations are one of our core strengths. We connect Salesforce to your other tools and build automated workflows that keep your data in sync, trigger actions based on CRM events, and eliminate manual data entry.",
   },
   {
-    question: "How long does it take to implement an AI solution?",
+    question: "How long does it take to implement an automation?",
     answer:
-      "Implementation timelines vary based on complexity. Simple chatbots can be deployed within 1-2 weeks, while more complex custom automations may take 4-8 weeks. We'll provide a detailed timeline during our initial consultation.",
+      "Implementation timelines vary based on complexity. Simple automations can be deployed within 1-2 weeks, while more complex custom workflows may take 4-8 weeks. We'll provide a detailed timeline during our initial consultation.",
   },
   {
-    question: "Can you integrate with my existing CRM and tools?",
+    question: "What tools do you use to build automations?",
     answer:
-      "Yes! We specialize in integrating AI systems with popular platforms like HubSpot, Salesforce, Zapier, and many more. Our custom automations are designed to fit seamlessly into your existing tech stack.",
+      "We primarily use n8n for building workflows, along with direct API integrations. We also work with Zapier, Make, and other platforms depending on your existing tech stack and specific requirements.",
   },
   {
     question: "What kind of ROI can I expect?",
     answer:
-      "Most of our clients see significant ROI within the first 3 months. AI systems typically reduce operational costs by 40-60% while increasing lead conversion rates by 25-35%. We'll help you track and measure the impact of every automation we build.",
+      "Most of our clients see significant ROI within the first 3 months. Automation typically reduces operational costs by 40-60% while freeing up your team to focus on higher-value work. We'll help you track and measure the impact of every automation we build.",
   },
 ]
 
@@ -98,7 +98,7 @@ export function FAQSection() {
             Frequently Asked Questions
           </h2>
           <p className="self-stretch text-center text-muted-foreground text-sm font-medium leading-[18.20px] break-words">
-            Everything you need to know about AI automation and how it can transform your business
+            Everything you need to know about workflow automation and how it can streamline your operations
           </p>
         </div>
       </div>

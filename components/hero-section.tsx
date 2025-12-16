@@ -78,12 +78,12 @@ export function HeroSection() {
         <Header />
       </div>
 
-      <div className="relative z-10 space-y-4 md:space-y-5 lg:space-y-6 mb-6 md:mb-7 lg:mb-9 max-w-md md:max-w-[500px] lg:max-w-[588px] mt-16 md:mt-[120px] lg:mt-[160px] px-4">
-        <h1 className="text-foreground text-3xl md:text-4xl lg:text-6xl font-semibold leading-tight">
-          Transform Your Business with AI Automation
+      <div className="relative z-10 space-y-4 md:space-y-5 lg:space-y-6 mb-6 md:mb-7 lg:mb-9 max-w-md md:max-w-[800px] lg:max-w-[900px] mt-16 md:mt-[120px] lg:mt-[160px] px-4">
+        <h1 className="text-foreground text-3xl md:text-4xl lg:text-6xl font-semibold leading-tight max-w-md md:max-w-[500px] lg:max-w-[588px] mx-auto">
+          Custom Automation for Your Business Operations
         </h1>
-        <p className="text-muted-foreground text-base md:text-base lg:text-lg font-medium leading-relaxed max-w-lg mx-auto">
-          Unlock unprecedented growth with intelligent automation that scales. From lead generation to customer support, we build AI that works 24/7.
+        <p className="text-muted-foreground text-base md:text-base lg:text-lg font-medium leading-relaxed mx-auto">
+          We build tailored automation solutions that streamline your internal processes. From Salesforce workflows to intelligent document handling, we solve the bottlenecks slowing your team down.
         </p>
       </div>
 

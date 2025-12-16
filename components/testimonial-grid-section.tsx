@@ -3,57 +3,57 @@ import Image from "next/image"
 const testimonials = [
   {
     quote:
-      "The real-time code suggestions from Pointer feel like having a senior engineer reviewing every line of code as you write. The accuracy of its recommendations has improved our overall code quality, reduced review time.",
+      "What used to take our team hours of manual data entry now happens automatically. The Salesforce integration they built has completely transformed how we handle license requests — it's faster, more accurate, and our team can focus on actual work.",
     name: "Annette Black",
-    company: "Sony",
+    company: "Operations Director",
     avatar: "/images/avatars/annette-black.png",
     type: "large-teal",
   },
   {
     quote:
-      "Integrating Pointer into our stack was smooth, and the MCP server connections saved us days of configuration work",
+      "They understood our workflow challenges immediately and delivered a solution that actually fits how we work, not the other way around.",
     name: "Dianne Russell",
-    company: "McDonald's",
+    company: "Project Manager",
     avatar: "/images/avatars/dianne-russell.png",
     type: "small-dark",
   },
   {
     quote:
-      "Pointer’s multi-agent coding feature has been a game changer. We’re fixing complex bugs in hours instead of spending entire sprints on them.",
+      "Our inbox was chaos before. Now every project email is automatically sorted, duplicates removed, and nothing falls through the cracks.",
     name: "Cameron Williamson",
-    company: "IBM",
+    company: "Team Lead",
     avatar: "/images/avatars/cameron-williamson.png",
     type: "small-dark",
   },
   {
     quote:
-      "We no longer juggle multiple tools. Pointer brought all our integrations together in one place, which simplified our entire workflow.",
+      "The meeting documentation system saves us at least an hour per meeting. Notes get compiled into structured documents automatically.",
     name: "Robert Fox",
-    company: "MasterCard",
+    company: "Account Executive",
     avatar: "/images/avatars/robert-fox.png",
     type: "small-dark",
   },
   {
     quote:
-      "We started with the free plan just to test it out, but within a week we upgraded to Pro. Now, we can’t imagine coding without it",
+      "We expected a generic solution but got something completely tailored to our specific needs. That made all the difference.",
     name: "Darlene Robertson",
-    company: "Ferrari",
+    company: "Business Owner",
     avatar: "/images/avatars/darlene-robertson.png",
     type: "small-dark",
   },
   {
     quote:
-      "Collaborative coding feels effortless now. With Pointer’s real-time previews, pair programming has become faster and more productive.",
+      "Professional, responsive, and they actually listen. The automation they built handles tasks we didn't even realize could be automated.",
     name: "Cody Fisher",
-    company: "Apple",
+    company: "Marketing Director",
     avatar: "/images/avatars/cody-fisher.png",
     type: "small-dark",
   },
   {
     quote:
-      "Deploying on Vercel with Pointer was not just simple, it felt seamless. We went from coding to seeing our changes live in minutes without worrying about build pipelines or configuration issues.",
+      "We went from spending half our day on repetitive admin tasks to having everything handled automatically. The ROI was obvious within the first month — we're finally working on things that actually move the business forward.",
     name: "Albert Flores",
-    company: "Louis Vuitton",
+    company: "Founder & CEO",
     avatar: "/images/avatars/albert-flores.png",
     type: "large-light",
   },
@@ -133,11 +133,10 @@ export function TestimonialGridSection() {
       <div className="self-stretch py-6 md:py-8 lg:py-14 flex flex-col justify-center items-center gap-2">
         <div className="flex flex-col justify-start items-center gap-4">
           <h2 className="text-center text-foreground text-3xl md:text-4xl lg:text-[40px] font-semibold leading-tight md:leading-tight lg:leading-[40px]">
-            Coding made effortless
+            Real Results, Real Impact
           </h2>
           <p className="self-stretch text-center text-muted-foreground text-sm md:text-sm lg:text-base font-medium leading-[18.20px] md:leading-relaxed lg:leading-relaxed">
-            {"Hear how developers ship products faster, collaborate seamlessly,"} <br />{" "}
-            {"and build with confidence using Pointer's powerful AI tools"}
+            See how businesses are saving time and eliminating manual work with custom automation solutions.
           </p>
         </div>
       </div>
