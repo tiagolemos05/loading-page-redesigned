@@ -11,7 +11,25 @@ interface RotatingEarthProps {
 
 export default function RotatingEarth({ width = 800, height = 600, className = "" }: RotatingEarthProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [error, setError] = useState<string | null>(null)
+  const isVisibleRef = useRef(true)
+
+  // Intersection observer to detect visibility
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting
+      },
+      { threshold: 0.1 }
+    )
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -126,10 +144,18 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
 
     // Set up rotation
     const rotation = [0, 0]
-    const rotationSpeed = 0.5
+    const rotationSpeed = 0.35 // Adjusted for 45fps
+    let lastFrameTime = 0
+    const frameInterval = 1000 / 45 // 45fps
     let rotationTimer: d3.Timer | null = null
 
-    const rotate = () => {
+    const rotate = (elapsed: number) => {
+      if (!isVisibleRef.current) return // Skip rotation when not visible
+      
+      // Throttle to 30fps
+      if (elapsed - lastFrameTime < frameInterval) return
+      lastFrameTime = elapsed
+      
       rotation[0] += rotationSpeed
       projection.rotate(rotation)
       render()
@@ -168,7 +194,7 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative ${className}`}>
       <div 
         style={{ 
           maskImage: 'radial-gradient(ellipse 80% 70% at center 45%, black 50%, transparent 100%)',

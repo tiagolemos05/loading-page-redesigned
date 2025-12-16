@@ -7,7 +7,7 @@ import RotatingEarth from "./rotating-earth"
 export function HeroSection() {
   return (
     <section
-      className="flex flex-col items-center text-center relative mx-auto rounded-2xl overflow-hidden my-6 py-0 px-4
+      className="flex flex-col items-center text-center relative mx-auto rounded-2xl overflow-hidden my-6 py-0 px-4 contain-content
          w-full h-[750px] md:w-[1220px] md:h-[950px] lg:h-[1150px] md:px-0"
     >
       {/* CSS Grid Background - top */}

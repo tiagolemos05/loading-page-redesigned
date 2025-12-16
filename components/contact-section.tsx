@@ -52,7 +52,7 @@ export function ContactSection() {
   }
 
   return (
-    <section className="w-full px-5 py-16 md:py-24 relative">
+    <section className="w-full px-5 py-16 md:py-24 relative contain-content">
       {/* Wave separator with glow */}
       <div className="absolute top-0 left-0 right-0 h-[200px] overflow-hidden">
         {/* Wave shape - solid background */}
