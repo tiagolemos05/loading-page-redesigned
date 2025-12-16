@@ -102,9 +102,9 @@ export function ContactSection() {
 
           {isSuccess ? (
             <div className="relative z-10 text-center py-6 md:py-8">
-              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-full bg-primary/20 flex items-center justify-center">
                 <svg
-                  className="w-6 h-6 md:w-8 md:h-8 text-green-500"
+                  className="w-6 h-6 md:w-8 md:h-8 text-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
