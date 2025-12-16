@@ -43,7 +43,8 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
     const containerHeight = Math.min(height, window.innerHeight - 100)
     const radius = Math.min(containerWidth, containerHeight) / 2.5
 
-    const dpr = window.devicePixelRatio || 1
+    // Cap DPR at 1.5 for performance (still looks good, much less pixels)
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
     canvas.width = containerWidth * dpr
     canvas.height = containerHeight * dpr
     canvas.style.width = `${containerWidth}px`
@@ -108,19 +109,14 @@ export default function RotatingEarth({ width = 800, height = 600, className = "
           context.restore()
         }
 
-        // Fill land to cover grid inside countries
+        // Batch: Build single path for all land features, then fill and stroke once
         context.beginPath()
         landFeatures.features.forEach((feature: any) => {
           path(feature)
         })
+        // Fill and stroke in one go
         context.fillStyle = "#000000"
         context.fill()
-
-        // Draw land outlines
-        context.beginPath()
-        landFeatures.features.forEach((feature: any) => {
-          path(feature)
-        })
         context.strokeStyle = "#ffffff"
         context.lineWidth = 1 * scaleFactor
         context.stroke()
