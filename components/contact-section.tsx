@@ -59,7 +59,7 @@ export function ContactSection() {
         <div 
           className="absolute top-0 left-0 right-0 h-[100px] z-20"
           style={{
-            backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="M0 0v4c250 0 250 96 500 96S750 4 1000 4V0H0Z" fill="%230f1211"></path></svg>')`,
+            backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="M0 0v4c250 0 250 96 500 96S750 4 1000 4V0H0Z" fill="%23101214"></path></svg>')`,
             backgroundSize: '100% 100%',
             backgroundRepeat: 'no-repeat',
           }}
