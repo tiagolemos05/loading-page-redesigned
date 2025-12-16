@@ -51,6 +51,20 @@
   }
   html {
     scroll-behavior: smooth;
+    font-size: 16px;
+  }
+  
+  /* Scale down text for smaller mobile screens */
+  @media (max-width: 390px) {
+    html {
+      font-size: 15.2px; /* 5% smaller */
+    }
+  }
+  
+  @media (max-width: 340px) {
+    html {
+      font-size: 14.4px; /* 10% smaller */
+    }
   }
 }
 

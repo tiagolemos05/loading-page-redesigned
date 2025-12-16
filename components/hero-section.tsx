@@ -130,7 +130,8 @@ export function HeroSection() {
           Custom Automation for Your Business Operations
         </h1>
         <p className="text-muted-foreground text-sm md:text-base lg:text-lg font-medium leading-relaxed mx-auto">
-          We build tailored automation solutions that streamline your internal processes. From Salesforce workflows to intelligent document handling, we solve the bottlenecks slowing your team down.
+          <span className="md:hidden">We automate the repetitive work slowing your team down.</span>
+          <span className="hidden md:inline">We build tailored automation solutions that streamline your internal processes. From Salesforce workflows to intelligent document handling, we solve the bottlenecks slowing your team down.</span>
         </p>
       </div>
 
@@ -140,7 +141,7 @@ export function HeroSection() {
         </Button>
       </Link>
 
-      <div className="relative z-10 mt-5 md:mt-12 w-[85vw] max-w-[320px] md:max-w-[600px] lg:max-w-[700px] mx-auto">
+      <div className="relative z-10 mt-10 md:mt-12 w-[85vw] max-w-[320px] md:max-w-[600px] lg:max-w-[700px] mx-auto">
         <RotatingEarth width={700} height={500} className="mx-auto w-full" />
         <p className="text-center text-muted-foreground text-xs md:text-base lg:text-lg mt-2 md:mt-4">Based in Europe, automating worldwide</p>
       </div>
