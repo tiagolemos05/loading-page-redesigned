@@ -10,7 +10,6 @@ import Link from "next/link" // Import Link for client-side navigation
 export function Header() {
   const navItems = [
     { name: "Services", href: "#features-section" },
-    { name: "Pricing", href: "#pricing-section" },
     { name: "Contact", href: "#contact-section" },
   ]
 
