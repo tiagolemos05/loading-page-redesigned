@@ -109,3 +109,67 @@
     display: none;
   }
 }
+
+/* Blog prose styles for GFM elements */
+.prose del {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+}
+
+.prose th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid hsl(var(--foreground) / 0.1);
+  color: hsl(var(--foreground));
+  font-weight: 600;
+}
+
+.prose td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid hsl(var(--foreground) / 0.06);
+  color: hsl(var(--muted-foreground));
+}
+
+.prose tr:last-child td {
+  border-bottom: none;
+}
+
+.prose input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid hsl(var(--foreground) / 0.3);
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  position: relative;
+  cursor: default;
+}
+
+.prose input[type="checkbox"]:checked {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+.prose input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid hsl(var(--primary-foreground));
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.prose li:has(input[type="checkbox"]) {
+  list-style: none;
+  margin-left: -1.5rem;
+}

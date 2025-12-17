@@ -1,6 +1,7 @@
 import { getSupabase, getSupabaseAdmin, Post } from './supabase'
 import { remark } from 'remark'
 import html from 'remark-html'
+import gfm from 'remark-gfm'
 
 export type { Post }
 
@@ -47,9 +48,10 @@ export async function getPostBySlug(slug: string, includeDrafts = false): Promis
     return null
   }
 
-  // Convert markdown to HTML
+  // Convert markdown to HTML with GFM support
   const processedContent = await remark()
-    .use(html)
+    .use(gfm)
+    .use(html, { sanitize: false })
     .process(data.content)
   const contentHtml = processedContent.toString()
 

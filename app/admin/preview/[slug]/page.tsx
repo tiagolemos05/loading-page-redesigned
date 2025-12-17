@@ -6,6 +6,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { remark } from 'remark'
 import html from 'remark-html'
+import gfm from 'remark-gfm'
 
 function ContentGrid() {
   return (
@@ -70,7 +71,7 @@ export default function AdminPreview() {
 
     if (data) {
       setPost(data)
-      const processed = await remark().use(html).process(data.content)
+      const processed = await remark().use(gfm).use(html, { sanitize: false }).process(data.content)
       setContentHtml(processed.toString())
     }
     setLoading(false)
