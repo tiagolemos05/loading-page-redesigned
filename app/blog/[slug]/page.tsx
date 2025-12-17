@@ -1,18 +1,17 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getPostBySlug, getAllPosts, formatDate, calculateReadingTime } from '@/lib/blog'
+import { getPostBySlug, getAllPosts, formatDate } from '@/lib/blog'
 import { BlogHeader, BlogBackLink, CopyUrlButton, ReadingTime } from '@/components/blog-header'
-import matter from 'gray-matter'
-import fs from 'fs'
-import path from 'path'
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
+export const revalidate = 60
+
 export async function generateStaticParams() {
-  const posts = getAllPosts()
+  const posts = await getAllPosts()
   return posts.map((post) => ({ slug: post.slug }))
 }
 
@@ -26,16 +25,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${post.title} - Node Wave Blog`,
-    description: post.description,
+    description: post.description || '',
   }
-}
-
-function getRawContent(slug: string): string {
-  const fullPath = path.join(process.cwd(), 'content/blog', `${slug}.md`)
-  if (!fs.existsSync(fullPath)) return ''
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-  const { content } = matter(fileContents)
-  return content
 }
 
 function ContentGrid() {
@@ -86,9 +77,6 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound()
   }
 
-  const rawContent = getRawContent(slug)
-  const readingTime = calculateReadingTime(rawContent)
-
   return (
     <div className="min-h-screen bg-background">
       <BlogHeader />
@@ -123,11 +111,11 @@ export default async function BlogPostPage({ params }: PageProps) {
             <div className="absolute top-0 h-px bg-foreground/[0.06]" style={{ left: '-80px', right: '-80px' }} />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <ReadingTime minutes={readingTime} />
+                <ReadingTime minutes={post.reading_time || 1} />
                 <CopyUrlButton />
               </div>
               <time className="text-muted-foreground text-sm">
-                {formatDate(post.date)}
+                {formatDate(post.published_at || post.created_at)}
               </time>
             </div>
           </div>
@@ -154,7 +142,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 prose-ul:text-muted-foreground prose-ol:text-muted-foreground
                 prose-li:marker:text-primary/50
                 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-blockquote:italic"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: post.contentHtml }}
             />
           </article>
 

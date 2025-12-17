@@ -8,8 +8,10 @@ export const metadata: Metadata = {
   description: 'Learn about AI automation, workflow optimization, and how to streamline your business operations.',
 }
 
-export default function BlogPage() {
-  const posts = getAllPosts()
+export const revalidate = 60
+
+export default async function BlogPage() {
+  const posts = await getAllPosts()
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -31,13 +33,13 @@ export default function BlogPage() {
           ) : (
             <div className="flex flex-col">
               {posts.map((post, index) => (
-                <article key={post.slug}>
+                <article key={post.id}>
                   <Link 
                     href={`/blog/${post.slug}`}
                     className="group block py-8"
                   >
                     <time className="text-muted-foreground text-sm mb-2 block">
-                      {formatDate(post.date)}
+                      {formatDate(post.published_at || post.created_at)}
                     </time>
                     <h2 className="text-foreground text-xl md:text-2xl font-medium mb-2 group-hover:text-primary transition-colors">
                       {post.title}
@@ -56,7 +58,7 @@ export default function BlogPage() {
         </div>
       </main>
 
-      <footer className="border-t border-foreground/[0.06] py-8 mt-auto">
+      <footer className="py-8 mt-auto">
         <div className="max-w-[1320px] mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
             ← Back to Node Wave

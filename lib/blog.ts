@@ -1,91 +1,75 @@
-import fs from 'fs'
-import path from 'path'
-import matter from 'gray-matter'
+import { supabase, getSupabaseAdmin, Post } from './supabase'
 import { remark } from 'remark'
 import html from 'remark-html'
 
-const postsDirectory = path.join(process.cwd(), 'content/blog')
+export type { Post }
 
-export interface PostMeta {
-  slug: string
-  title: string
-  description: string
-  date: string
-  draft?: boolean
-  author?: string
-  tags?: string[]
+export interface PostWithHtml extends Post {
+  contentHtml: string
 }
 
-export interface Post extends PostMeta {
-  content: string
-}
+export async function getAllPosts(includeDrafts = false): Promise<Post[]> {
+  const client = includeDrafts ? getSupabaseAdmin() : supabase
+  
+  let query = client
+    .from('posts')
+    .select('*')
+    .order('published_at', { ascending: false, nullsFirst: false })
 
-export function getAllPosts(includeDrafts = false): PostMeta[] {
-  if (!fs.existsSync(postsDirectory)) {
+  if (!includeDrafts) {
+    query = query.eq('draft', false)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('Error fetching posts:', error)
     return []
   }
 
-  const fileNames = fs.readdirSync(postsDirectory)
-  const allPosts = fileNames
-    .filter((fileName) => fileName.endsWith('.md'))
-    .map((fileName) => {
-      const slug = fileName.replace(/\.md$/, '')
-      const fullPath = path.join(postsDirectory, fileName)
-      const fileContents = fs.readFileSync(fullPath, 'utf8')
-      const { data } = matter(fileContents)
-
-      return {
-        slug,
-        title: data.title || slug,
-        description: data.description || '',
-        date: data.date || new Date().toISOString(),
-        draft: data.draft || false,
-        author: data.author,
-        tags: data.tags || [],
-      }
-    })
-    .filter((post) => includeDrafts || !post.draft)
-    .sort((a, b) => (new Date(b.date).getTime() - new Date(a.date).getTime()))
-
-  return allPosts
+  return data || []
 }
 
-export async function getPostBySlug(slug: string): Promise<Post | null> {
-  const fullPath = path.join(postsDirectory, `${slug}.md`)
+export async function getPostBySlug(slug: string, includeDrafts = false): Promise<PostWithHtml | null> {
+  const client = includeDrafts ? getSupabaseAdmin() : supabase
   
-  if (!fs.existsSync(fullPath)) {
+  const { data, error } = await client
+    .from('posts')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+
+  if (error || !data) {
     return null
   }
 
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-  const { data, content } = matter(fileContents)
+  if (!includeDrafts && data.draft) {
+    return null
+  }
 
+  // Convert markdown to HTML
   const processedContent = await remark()
     .use(html)
-    .process(content)
+    .process(data.content)
   const contentHtml = processedContent.toString()
 
   return {
-    slug,
-    title: data.title || slug,
-    description: data.description || '',
-    date: data.date || new Date().toISOString(),
-    draft: data.draft || false,
-    author: data.author,
-    tags: data.tags || [],
-    content: contentHtml,
+    ...data,
+    contentHtml,
   }
 }
 
-export function getAllPostSlugs(): string[] {
-  if (!fs.existsSync(postsDirectory)) {
+export async function getAllPostSlugs(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('slug')
+    .eq('draft', false)
+
+  if (error || !data) {
     return []
   }
 
-  const fileNames = fs.readdirSync(postsDirectory)
-  return fileNames
-    .filter((fileName) => fileName.endsWith('.md'))
-    .map((fileName) => fileName.replace(/\.md$/, ''))
+  return data.map((post) => post.slug)
 }
 
 export function formatDate(dateString: string): string {
