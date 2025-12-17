@@ -1,4 +1,4 @@
-import { supabase, getSupabaseAdmin, Post } from './supabase'
+import { getSupabase, getSupabaseAdmin, Post } from './supabase'
 import { remark } from 'remark'
 import html from 'remark-html'
 
@@ -9,7 +9,7 @@ export interface PostWithHtml extends Post {
 }
 
 export async function getAllPosts(includeDrafts = false): Promise<Post[]> {
-  const client = includeDrafts ? getSupabaseAdmin() : supabase
+  const client = includeDrafts ? getSupabaseAdmin() : getSupabase()
   
   let query = client
     .from('posts')
@@ -31,7 +31,7 @@ export async function getAllPosts(includeDrafts = false): Promise<Post[]> {
 }
 
 export async function getPostBySlug(slug: string, includeDrafts = false): Promise<PostWithHtml | null> {
-  const client = includeDrafts ? getSupabaseAdmin() : supabase
+  const client = includeDrafts ? getSupabaseAdmin() : getSupabase()
   
   const { data, error } = await client
     .from('posts')
@@ -60,7 +60,9 @@ export async function getPostBySlug(slug: string, includeDrafts = false): Promis
 }
 
 export async function getAllPostSlugs(): Promise<string[]> {
-  const { data, error } = await supabase
+  const client = getSupabase()
+  
+  const { data, error } = await client
     .from('posts')
     .select('slug')
     .eq('draft', false)

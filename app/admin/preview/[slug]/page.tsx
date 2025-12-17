@@ -1,105 +1,129 @@
-import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { supabase, Post } from '@/lib/supabase'
+import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { getPostBySlug, getAllPosts, formatDate } from '@/lib/blog'
-import { BlogHeader, BlogBackLink, CopyUrlButton, ReadingTime } from '@/components/blog-header'
-
-interface PageProps {
-  params: Promise<{ slug: string }>
-}
-
-export const revalidate = 60
-
-export async function generateStaticParams() {
-  // Skip static generation if env vars not available (build time)
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return []
-  }
-  const posts = await getAllPosts()
-  return posts.map((post) => ({ slug: post.slug }))
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return { title: 'Blog - Node Wave' }
-  }
-  
-  const { slug } = await params
-  const post = await getPostBySlug(slug)
-  
-  if (!post) {
-    return { title: 'Post Not Found' }
-  }
-
-  return {
-    title: `${post.title} - Node Wave Blog`,
-    description: post.description || '',
-  }
-}
+import { remark } from 'remark'
+import html from 'remark-html'
 
 function ContentGrid() {
   return (
     <div className="absolute inset-0 pointer-events-none hidden md:block overflow-visible" style={{ left: '-80px', right: '-80px' }}>
-      {/* Vertical grid lines */}
       <div 
         className="absolute inset-0"
         style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--foreground) / 0.06) 1px, transparent 1px)
-          `,
+          backgroundImage: `linear-gradient(to right, hsl(var(--foreground) / 0.06) 1px, transparent 1px)`,
           backgroundSize: '33.333% 100%',
           backgroundPosition: 'left',
         }}
       />
-      {/* Right edge vertical line */}
       <div className="absolute top-0 bottom-0 right-0 w-px bg-foreground/[0.06]" />
-      {/* Top horizontal line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-foreground/[0.06]" />
-      {/* Bottom horizontal line */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-foreground/[0.06]" />
       
-      {/* Corner markers - top left */}
       <div className="absolute w-[15px] h-[3px] bg-foreground/30" style={{ top: '-1px', left: '-1px' }} />
       <div className="absolute w-[3px] h-[12px] bg-foreground/30" style={{ top: '2px', left: '-1px' }} />
-      
-      {/* Corner markers - top right */}
       <div className="absolute w-[15px] h-[3px] bg-foreground/30" style={{ top: '-1px', right: '-1px' }} />
       <div className="absolute w-[3px] h-[12px] bg-foreground/30" style={{ top: '2px', right: '-1px' }} />
-      
-      {/* Corner markers - bottom left */}
       <div className="absolute w-[15px] h-[3px] bg-foreground/30" style={{ bottom: '-1px', left: '-1px' }} />
       <div className="absolute w-[3px] h-[12px] bg-foreground/30" style={{ bottom: '2px', left: '-1px' }} />
-      
-      {/* Corner markers - bottom right */}
       <div className="absolute w-[15px] h-[3px] bg-foreground/30" style={{ bottom: '-1px', right: '-1px' }} />
       <div className="absolute w-[3px] h-[12px] bg-foreground/30" style={{ bottom: '2px', right: '-1px' }} />
     </div>
   )
 }
 
-export default async function BlogPostPage({ params }: PageProps) {
-  const { slug } = await params
-  const post = await getPostBySlug(slug)
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
-  if (!post || post.draft) {
-    notFound()
+export default function AdminPreview() {
+  const [post, setPost] = useState<Post | null>(null)
+  const [contentHtml, setContentHtml] = useState('')
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const params = useParams()
+  const slug = params.slug as string
+
+  useEffect(() => {
+    checkAuthAndFetch()
+  }, [slug])
+
+  const checkAuthAndFetch = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      router.push('/admin')
+      return
+    }
+
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('slug', slug)
+      .single()
+
+    if (data) {
+      setPost(data)
+      const processed = await remark().use(html).process(data.content)
+      setContentHtml(processed.toString())
+    }
+    setLoading(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading preview...</p>
+      </div>
+    )
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Post not found</p>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <BlogHeader />
+      {/* Preview banner */}
+      <div className="bg-yellow-500/20 border-b border-yellow-500/30 py-2 px-6">
+        <div className="max-w-[1320px] mx-auto flex items-center justify-between">
+          <span className="text-yellow-500 text-sm font-medium">
+            Preview Mode {post.draft && '(Draft)'}
+          </span>
+          <Link
+            href="/admin/dashboard"
+            className="text-yellow-500 hover:text-yellow-400 text-sm transition-colors"
+          >
+            ← Back to Admin
+          </Link>
+        </div>
+      </div>
+
+      <header className="w-full py-6 px-6">
+        <div className="w-full max-w-[1320px] mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="text-foreground text-xl font-semibold">Node Wave</span>
+            <span className="text-foreground/20">/</span>
+            <span className="text-muted-foreground">Blog</span>
+          </div>
+          <span className="text-muted-foreground text-sm">Get in touch</span>
+        </div>
+      </header>
       
       <main className="max-w-3xl mx-auto px-6">
-        {/* Content area with grid */}
         <div className="relative pt-16 pb-16">
           <ContentGrid />
           
-          {/* Back link */}
-          <div className="mb-8 relative z-10">
-            <BlogBackLink />
-          </div>
-          
-          {/* Header */}
           <header className="text-center mb-12 relative z-10">
             <h1 className="text-foreground text-3xl md:text-4xl lg:text-5xl font-semibold mb-6 leading-tight">
               {post.title}
@@ -114,13 +138,17 @@ export default async function BlogPostPage({ params }: PageProps) {
             )}
           </header>
 
-          {/* Meta row */}
           <div className="relative py-4 mb-12 z-10">
             <div className="absolute top-0 h-px bg-foreground/[0.06]" style={{ left: '-80px', right: '-80px' }} />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <ReadingTime minutes={post.reading_time || 1} />
-                <CopyUrlButton />
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground text-sm">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  {post.reading_time} min read
+                </span>
               </div>
               <time className="text-muted-foreground text-sm">
                 {formatDate(post.published_at || post.created_at)}
@@ -128,14 +156,12 @@ export default async function BlogPostPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Description as lead paragraph */}
           {post.description && (
             <p className="text-muted-foreground text-lg md:text-xl leading-relaxed mb-8 relative z-10">
               {post.description}
             </p>
           )}
 
-          {/* Article content */}
           <article className="relative z-10">
             <div 
               className="prose prose-invert prose-lg max-w-none
@@ -150,11 +176,10 @@ export default async function BlogPostPage({ params }: PageProps) {
                 prose-ul:text-muted-foreground prose-ol:text-muted-foreground
                 prose-li:marker:text-primary/50
                 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-blockquote:italic"
-              dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+              dangerouslySetInnerHTML={{ __html: contentHtml }}
             />
           </article>
 
-          {/* CTA box */}
           <div className="mt-16 relative z-10">
             <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-8">
               <h3 className="text-foreground text-xl font-semibold mb-2">
@@ -163,12 +188,9 @@ export default async function BlogPostPage({ params }: PageProps) {
               <p className="text-muted-foreground mb-4">
                 Let&apos;s discuss how we can streamline your business operations.
               </p>
-              <Link 
-                href="/#contact-section"
-                className="inline-flex items-center text-primary hover:underline font-medium"
-              >
+              <span className="inline-flex items-center text-primary font-medium">
                 Get in touch →
-              </Link>
+              </span>
             </div>
           </div>
         </div>
@@ -176,12 +198,10 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       <footer className="py-8">
         <div className="max-w-[1320px] mx-auto px-6 flex items-center justify-between">
-          <Link href="/blog" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-            ← Back to blog
+          <Link href="/admin/dashboard" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+            ← Back to Admin
           </Link>
-          <Link href="/#contact-section" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-            Get in touch
-          </Link>
+          <span className="text-muted-foreground text-sm">Get in touch</span>
         </div>
       </footer>
     </div>

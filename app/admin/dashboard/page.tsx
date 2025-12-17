@@ -4,11 +4,18 @@ import { useEffect, useState } from 'react'
 import { supabase, Post } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ConfirmModal } from '@/components/confirm-modal'
+
+type ModalAction = {
+  type: 'publish' | 'unpublish' | 'delete'
+  post: Post
+} | null
 
 export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const [modalAction, setModalAction] = useState<ModalAction>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -37,38 +44,72 @@ export default function AdminDashboard() {
     setLoading(false)
   }
 
-  const togglePublish = async (post: Post) => {
-    const updates: any = { draft: !post.draft }
-    if (post.draft) {
-      updates.published_at = new Date().toISOString()
+  const handleConfirmAction = async () => {
+    if (!modalAction) return
+
+    const { type, post } = modalAction
+
+    if (type === 'publish' || type === 'unpublish') {
+      const updates: any = { draft: type === 'unpublish' }
+      if (type === 'publish') {
+        updates.published_at = new Date().toISOString()
+      }
+
+      const { error } = await supabase
+        .from('posts')
+        .update(updates)
+        .eq('id', post.id)
+
+      if (!error) {
+        fetchPosts()
+      }
+    } else if (type === 'delete') {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', post.id)
+
+      if (!error) {
+        fetchPosts()
+      }
     }
 
-    const { error } = await supabase
-      .from('posts')
-      .update(updates)
-      .eq('id', post.id)
-
-    if (!error) {
-      fetchPosts()
-    }
-  }
-
-  const deletePost = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this post?')) return
-
-    const { error } = await supabase
-      .from('posts')
-      .delete()
-      .eq('id', id)
-
-    if (!error) {
-      fetchPosts()
-    }
+    setModalAction(null)
   }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/admin')
+  }
+
+  const getModalContent = () => {
+    if (!modalAction) return { title: '', message: '', confirmText: '', variant: 'primary' as const }
+
+    const { type, post } = modalAction
+
+    switch (type) {
+      case 'publish':
+        return {
+          title: 'Publish Post',
+          message: `Are you sure you want to publish "${post.title}"? It will be visible to everyone.`,
+          confirmText: 'Publish',
+          variant: 'primary' as const,
+        }
+      case 'unpublish':
+        return {
+          title: 'Unpublish Post',
+          message: `Are you sure you want to unpublish "${post.title}"? It will no longer be visible to the public.`,
+          confirmText: 'Unpublish',
+          variant: 'danger' as const,
+        }
+      case 'delete':
+        return {
+          title: 'Delete Post',
+          message: `Are you sure you want to delete "${post.title}"? This action cannot be undone.`,
+          confirmText: 'Delete',
+          variant: 'danger' as const,
+        }
+    }
   }
 
   if (loading) {
@@ -78,6 +119,8 @@ export default function AdminDashboard() {
       </div>
     )
   }
+
+  const modalContent = getModalContent()
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -147,8 +190,7 @@ export default function AdminDashboard() {
                     </p>
                     <div className="flex items-center gap-3">
                       <Link
-                        href={`/blog/${post.slug}`}
-                        target="_blank"
+                        href={`/admin/preview/${post.slug}`}
                         className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-foreground/[0.06] rounded transition-colors"
                       >
                         Preview
@@ -160,7 +202,7 @@ export default function AdminDashboard() {
                         Edit
                       </Link>
                       <button
-                        onClick={() => togglePublish(post)}
+                        onClick={() => setModalAction({ type: post.draft ? 'publish' : 'unpublish', post })}
                         className={`px-3 py-1.5 text-sm rounded transition-colors ${
                           post.draft
                             ? 'bg-primary text-primary-foreground hover:bg-primary/90'
@@ -170,7 +212,7 @@ export default function AdminDashboard() {
                         {post.draft ? 'Publish' : 'Unpublish'}
                       </button>
                       <button
-                        onClick={() => deletePost(post.id)}
+                        onClick={() => setModalAction({ type: 'delete', post })}
                         className="px-3 py-1.5 text-sm text-red-500 hover:bg-red-500/10 rounded transition-colors"
                       >
                         Delete
@@ -197,6 +239,16 @@ export default function AdminDashboard() {
           </Link>
         </div>
       </footer>
+
+      <ConfirmModal
+        isOpen={modalAction !== null}
+        title={modalContent.title}
+        message={modalContent.message}
+        confirmText={modalContent.confirmText}
+        confirmVariant={modalContent.variant}
+        onConfirm={handleConfirmAction}
+        onCancel={() => setModalAction(null)}
+      />
     </div>
   )
 }
