@@ -48,6 +48,9 @@ export function FooterSection() {
             <a href="#" className="text-foreground text-sm font-normal leading-5 hover:underline">
               About us
             </a>
+            <a href="/blog" className="text-foreground text-sm font-normal leading-5 hover:underline">
+              Blog
+            </a>
             <a href="#contact-section" className="text-foreground text-sm font-normal leading-5 hover:underline">
               Contact
             </a>
