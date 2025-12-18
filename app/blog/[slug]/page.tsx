@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const postUrl = `${BASE_URL}/blog/${post.slug}`
 
   return {
-    title: `${post.title} - Node Wave Blog`,
+    title: post.meta_title || `${post.title} - Node Wave Blog`,
     description: post.description || '',
     authors: post.author ? [{ name: post.author }] : undefined,
     keywords: post.tags?.length ? post.tags : undefined,

@@ -54,6 +54,8 @@ export default function EditPost() {
         content: post.content,
         author: post.author,
         tags: post.tags,
+        meta_title: post.meta_title,
+        focus_keyword: post.focus_keyword,
       })
       .eq('id', id)
 
@@ -141,6 +143,28 @@ export default function EditPost() {
                 onChange={(e) => setPost({ ...post, description: e.target.value })}
                 rows={2}
                 className="w-full px-4 py-3 bg-foreground/[0.03] border border-foreground/[0.06] rounded-lg text-foreground focus:outline-none focus:border-primary transition-colors resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-muted-foreground text-sm mb-2">Meta Title (SEO)</label>
+              <input
+                type="text"
+                value={post.meta_title || ''}
+                onChange={(e) => setPost({ ...post, meta_title: e.target.value })}
+                placeholder="Leave empty to use post title"
+                className="w-full px-4 py-3 bg-foreground/[0.03] border border-foreground/[0.06] rounded-lg text-foreground focus:outline-none focus:border-primary transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-muted-foreground text-sm mb-2">Focus Keyword</label>
+              <input
+                type="text"
+                value={post.focus_keyword || ''}
+                onChange={(e) => setPost({ ...post, focus_keyword: e.target.value })}
+                placeholder="Primary keyword for SEO"
+                className="w-full px-4 py-3 bg-foreground/[0.03] border border-foreground/[0.06] rounded-lg text-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 

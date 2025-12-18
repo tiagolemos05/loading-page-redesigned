@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
-    const { title, description, content, author, tags, slug: customSlug, reading_time: customReadingTime } = body
+    const { title, description, content, author, tags, slug: customSlug, reading_time: customReadingTime, meta_title, focus_keyword } = body
 
     if (!title || !content) {
       return NextResponse.json(
@@ -49,6 +49,8 @@ export async function POST(request: NextRequest) {
         reading_time,
         tags: tags || [],
         draft: true,
+        meta_title: meta_title || null,
+        focus_keyword: focus_keyword || null,
       })
       .select()
       .single()
