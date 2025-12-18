@@ -5,23 +5,49 @@ import { supabase, Post } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ConfirmModal } from '@/components/confirm-modal'
+import { SourcesModal } from '@/components/sources-modal'
+import { ViewsChart } from '@/components/views-chart'
 
 type ModalAction = {
   type: 'publish' | 'unpublish' | 'delete'
   post: Post
 } | null
 
+type TimeFrame = '7' | '28' | '90' | 'all'
+
+type AnalyticsData = {
+  dailyData: { date: string; views: number; visitors: number }[]
+  sources: { referrer: string | null; count: number }[]
+  topArticles: { slug: string; views: number }[]
+  summary: {
+    totalViews: number
+    uniqueVisitors: number
+    blogOverviewViews: number
+  }
+}
+
 export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [modalAction, setModalAction] = useState<ModalAction>(null)
+  const [activeTab, setActiveTab] = useState<'drafts' | 'live'>('drafts')
+  const [timeFrame, setTimeFrame] = useState<TimeFrame>('28')
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [showSourcesModal, setShowSourcesModal] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     checkAuth()
     fetchPosts()
   }, [])
+
+  useEffect(() => {
+    if (activeTab === 'live' && user) {
+      fetchAnalytics()
+    }
+  }, [activeTab, timeFrame, user])
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -42,6 +68,28 @@ export default function AdminDashboard() {
       setPosts(data)
     }
     setLoading(false)
+  }
+
+  const fetchAnalytics = async () => {
+    setAnalyticsLoading(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const days = timeFrame === 'all' ? '365' : timeFrame
+      
+      const response = await fetch(`/api/analytics?days=${days}`, {
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setAnalytics(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error)
+    }
+    setAnalyticsLoading(false)
   }
 
   const handleConfirmAction = async () => {
@@ -112,6 +160,14 @@ export default function AdminDashboard() {
     }
   }
 
+  const draftPosts = posts.filter(p => p.draft)
+  const livePosts = posts.filter(p => !p.draft)
+
+  const formatDateShort = (dateStr: string) => {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -145,86 +201,58 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 flex-1 w-full">
+      <main className="max-w-5xl mx-auto px-6 flex-1 w-full">
         <div className="py-16">
-          <div className="mb-16 flex items-center justify-between">
-            <div>
-              <h1 className="text-foreground text-4xl md:text-5xl font-semibold mb-4">
-                Posts
-              </h1>
-              <p className="text-muted-foreground text-lg">
-                {posts.filter(p => p.draft).length} drafts, {posts.filter(p => !p.draft).length} published
-              </p>
-            </div>
+          <div className="mb-8">
+            <h1 className="text-foreground text-4xl md:text-5xl font-semibold mb-4">
+              Posts
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              {draftPosts.length} drafts, {livePosts.length} published
+            </p>
           </div>
 
-          {posts.length === 0 ? (
-            <p className="text-muted-foreground">No posts yet.</p>
+          {/* Tabs */}
+          <div className="flex gap-2 mb-8">
+            <button
+              onClick={() => setActiveTab('drafts')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === 'drafts'
+                  ? 'bg-foreground/10 text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Drafts ({draftPosts.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('live')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === 'live'
+                  ? 'bg-foreground/10 text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Live ({livePosts.length})
+            </button>
+          </div>
+
+          {/* Content */}
+          {activeTab === 'drafts' ? (
+            <DraftsList
+              posts={draftPosts}
+              onAction={setModalAction}
+            />
           ) : (
-            <div className="flex flex-col">
-              {posts.map((post, index) => (
-                <article key={post.id}>
-                  <div className="py-8">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span
-                        className={`px-2 py-0.5 text-xs rounded ${
-                          post.draft
-                            ? 'bg-yellow-500/20 text-yellow-500'
-                            : 'bg-green-500/20 text-green-500'
-                        }`}
-                      >
-                        {post.draft ? 'Draft' : 'Published'}
-                      </span>
-                      <span className="text-muted-foreground text-sm">
-                        {post.reading_time} min read
-                      </span>
-                    </div>
-                    <h2 className="text-foreground text-xl md:text-2xl font-medium mb-2">
-                      {post.title}
-                    </h2>
-                    <p className="text-muted-foreground leading-relaxed mb-3">
-                      {post.description}
-                    </p>
-                    <p className="text-muted-foreground/50 text-sm mb-4">
-                      /{post.slug} · Created {new Date(post.created_at).toLocaleDateString()}
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={`/admin/preview/${post.slug}`}
-                        className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-foreground/[0.06] rounded transition-colors"
-                      >
-                        Preview
-                      </Link>
-                      <Link
-                        href={`/admin/edit/${post.id}`}
-                        className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-foreground/[0.06] rounded transition-colors"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => setModalAction({ type: post.draft ? 'publish' : 'unpublish', post })}
-                        className={`px-3 py-1.5 text-sm rounded transition-colors ${
-                          post.draft
-                            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                            : 'border border-foreground/[0.06] text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        {post.draft ? 'Publish' : 'Unpublish'}
-                      </button>
-                      <button
-                        onClick={() => setModalAction({ type: 'delete', post })}
-                        className="px-3 py-1.5 text-sm text-red-500 hover:bg-red-500/10 rounded transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                  {index < posts.length - 1 && (
-                    <div className="border-b border-foreground/[0.06]" />
-                  )}
-                </article>
-              ))}
-            </div>
+            <LiveContent
+              posts={livePosts}
+              analytics={analytics}
+              analyticsLoading={analyticsLoading}
+              timeFrame={timeFrame}
+              setTimeFrame={setTimeFrame}
+              formatDateShort={formatDateShort}
+              onAction={setModalAction}
+              onShowSources={() => setShowSourcesModal(true)}
+            />
           )}
         </div>
       </main>
@@ -249,6 +277,304 @@ export default function AdminDashboard() {
         onConfirm={handleConfirmAction}
         onCancel={() => setModalAction(null)}
       />
+
+      <SourcesModal
+        isOpen={showSourcesModal}
+        sources={analytics?.sources || []}
+        onClose={() => setShowSourcesModal(false)}
+      />
     </div>
+  )
+}
+
+function DraftsList({ 
+  posts, 
+  onAction 
+}: { 
+  posts: Post[]
+  onAction: (action: ModalAction) => void 
+}) {
+  if (posts.length === 0) {
+    return (
+      <div className="py-16 text-center">
+        <p className="text-muted-foreground">No drafts yet.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col">
+      {posts.map((post, index) => (
+        <PostItem 
+          key={post.id} 
+          post={post} 
+          onAction={onAction}
+          showDivider={index < posts.length - 1}
+        />
+      ))}
+    </div>
+  )
+}
+
+function LiveContent({
+  posts,
+  analytics,
+  analyticsLoading,
+  timeFrame,
+  setTimeFrame,
+  formatDateShort,
+  onAction,
+  onShowSources,
+}: {
+  posts: Post[]
+  analytics: AnalyticsData | null
+  analyticsLoading: boolean
+  timeFrame: TimeFrame
+  setTimeFrame: (tf: TimeFrame) => void
+  formatDateShort: (date: string) => string
+  onAction: (action: ModalAction) => void
+  onShowSources: () => void
+}) {
+  const timeFrameOptions: { value: TimeFrame; label: string }[] = [
+    { value: '7', label: '7 days' },
+    { value: '28', label: '28 days' },
+    { value: '90', label: '90 days' },
+    { value: 'all', label: 'All time' },
+  ]
+
+  return (
+    <div className="space-y-8">
+      {/* Analytics Section */}
+      <div className="space-y-6">
+        {/* Time frame selector */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-foreground text-lg font-medium">Analytics</h2>
+          <div className="flex gap-1 bg-foreground/[0.03] rounded-lg p-1">
+            {timeFrameOptions.map(option => (
+              <button
+                key={option.value}
+                onClick={() => setTimeFrame(option.value)}
+                className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                  timeFrame === option.value
+                    ? 'bg-foreground/10 text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {analyticsLoading ? (
+          <div className="h-64 flex items-center justify-center">
+            <p className="text-muted-foreground">Loading analytics...</p>
+          </div>
+        ) : analytics ? (
+          <>
+            {/* Summary Stats */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
+                <p className="text-muted-foreground text-sm mb-1">Total Views</p>
+                <p className="text-foreground text-2xl font-semibold">
+                  {analytics.summary.totalViews.toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
+                <p className="text-muted-foreground text-sm mb-1">Unique Visitors</p>
+                <p className="text-foreground text-2xl font-semibold">
+                  {analytics.summary.uniqueVisitors.toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
+                <p className="text-muted-foreground text-sm mb-1">Blog Page Views</p>
+                <p className="text-foreground text-2xl font-semibold">
+                  {analytics.summary.blogOverviewViews.toLocaleString()}
+                </p>
+              </div>
+            </div>
+
+            {/* Views Chart */}
+            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6 overflow-visible">
+              <h3 className="text-foreground font-medium mb-4">Views Over Time</h3>
+              <ViewsChart data={analytics.dailyData} formatDateShort={formatDateShort} />
+            </div>
+
+            {/* Two column layout for sources and top articles */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Top Sources */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-foreground font-medium">Top Sources</h3>
+                  {analytics.sources.length > 5 && (
+                    <button
+                      onClick={onShowSources}
+                      className="text-primary text-sm hover:underline"
+                    >
+                      Show all
+                    </button>
+                  )}
+                </div>
+                {analytics.sources.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">No traffic data yet</p>
+                ) : (
+                  <div className="space-y-3">
+                    {analytics.sources.slice(0, 5).map((source) => {
+                      const totalViews = analytics.sources.reduce((sum, s) => sum + s.count, 0)
+                      const percentage = totalViews > 0 ? (source.count / totalViews) * 100 : 0
+                      return (
+                        <div key={source.referrer || 'direct'} className="relative">
+                          <div 
+                            className="absolute inset-0 bg-primary/10 rounded"
+                            style={{ width: `${percentage}%` }}
+                          />
+                          <div className="relative flex items-center justify-between py-1.5 px-2">
+                            <span className="text-foreground text-sm">
+                              {source.referrer || 'Direct'}
+                            </span>
+                            <span className="text-muted-foreground text-sm tabular-nums">
+                              {source.count.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Top Articles */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
+                <h3 className="text-foreground font-medium mb-4">Top Articles</h3>
+                {analytics.topArticles.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">No article views yet</p>
+                ) : (
+                  <div className="space-y-3">
+                    {analytics.topArticles.slice(0, 5).map((article, index) => {
+                      const maxViews = analytics.topArticles[0]?.views || 1
+                      const percentage = (article.views / maxViews) * 100
+                      return (
+                        <div key={article.slug} className="relative">
+                          <div 
+                            className="absolute inset-0 bg-primary/10 rounded"
+                            style={{ width: `${percentage}%` }}
+                          />
+                          <div className="relative flex items-center justify-between py-1.5 px-2">
+                            <span className="text-foreground text-sm truncate max-w-[70%]">
+                              /{article.slug}
+                            </span>
+                            <span className="text-muted-foreground text-sm tabular-nums">
+                              {article.views.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="h-64 flex items-center justify-center">
+            <p className="text-muted-foreground">No analytics data available</p>
+          </div>
+        )}
+      </div>
+
+      {/* Published Posts Section */}
+      <div>
+        <h2 className="text-foreground text-lg font-medium mb-4">Published Posts</h2>
+        {posts.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-muted-foreground">No published posts yet.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col">
+            {posts.map((post, index) => (
+              <PostItem 
+                key={post.id} 
+                post={post} 
+                onAction={onAction}
+                showDivider={index < posts.length - 1}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function PostItem({ 
+  post, 
+  onAction,
+  showDivider,
+}: { 
+  post: Post
+  onAction: (action: ModalAction) => void
+  showDivider: boolean
+}) {
+  return (
+    <article>
+      <div className="py-8">
+        <div className="flex items-center gap-3 mb-2">
+          <span
+            className={`px-2 py-0.5 text-xs rounded ${
+              post.draft
+                ? 'bg-yellow-500/20 text-yellow-500'
+                : 'bg-primary/20 text-primary'
+            }`}
+          >
+            {post.draft ? 'Draft' : 'Published'}
+          </span>
+          <span className="text-muted-foreground text-sm">
+            {post.reading_time} min read
+          </span>
+        </div>
+        <h2 className="text-foreground text-xl md:text-2xl font-medium mb-2">
+          {post.title}
+        </h2>
+        <p className="text-muted-foreground leading-relaxed mb-3">
+          {post.description}
+        </p>
+        <p className="text-muted-foreground/50 text-sm mb-4">
+          /{post.slug} · Created {new Date(post.created_at).toLocaleDateString()}
+        </p>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/admin/preview/${post.slug}`}
+            className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-foreground/[0.06] rounded transition-colors"
+          >
+            Preview
+          </Link>
+          <Link
+            href={`/admin/edit/${post.id}`}
+            className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-foreground/[0.06] rounded transition-colors"
+          >
+            Edit
+          </Link>
+          <button
+            onClick={() => onAction({ type: post.draft ? 'publish' : 'unpublish', post })}
+            className={`px-3 py-1.5 text-sm rounded transition-colors ${
+              post.draft
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'border border-foreground/[0.06] text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {post.draft ? 'Publish' : 'Unpublish'}
+          </button>
+          <button
+            onClick={() => onAction({ type: 'delete', post })}
+            className="px-3 py-1.5 text-sm text-red-500 hover:bg-red-500/10 rounded transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+      {showDivider && (
+        <div className="border-b border-foreground/[0.06]" />
+      )}
+    </article>
   )
 }

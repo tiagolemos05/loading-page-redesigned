@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getPostBySlug, getAllPosts, formatDate } from '@/lib/blog'
 import { BlogHeader, BlogBackLink, CopyUrlButton, ReadingTime } from '@/components/blog-header'
+import { PageTracker } from '@/components/page-tracker'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -87,6 +88,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageTracker slug={slug} />
       <BlogHeader />
       
       <main className="max-w-3xl mx-auto px-6">
