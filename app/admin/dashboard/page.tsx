@@ -87,9 +87,24 @@ export default function AdminDashboard() {
       if (response.ok) {
         const data = await response.json()
         setAnalytics(data)
+      } else {
+        // Set empty analytics on error
+        setAnalytics({
+          dailyData: [],
+          sources: [],
+          topArticles: [],
+          summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0 }
+        })
       }
     } catch (error) {
       console.error('Failed to fetch analytics:', error)
+      // Set empty analytics on error
+      setAnalytics({
+        dailyData: [],
+        sources: [],
+        topArticles: [],
+        summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0 }
+      })
     }
     setAnalyticsLoading(false)
   }
@@ -381,26 +396,26 @@ function LiveContent({
           <div className="h-64 flex items-center justify-center">
             <p className="text-muted-foreground">Loading analytics...</p>
           </div>
-        ) : analytics ? (
+        ) : (
           <>
             {/* Summary Stats */}
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">Total Views</p>
                 <p className="text-foreground text-2xl font-semibold">
-                  {analytics.summary.totalViews.toLocaleString()}
+                  {(analytics?.summary.totalViews ?? 0).toLocaleString()}
                 </p>
               </div>
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">Unique Visitors</p>
                 <p className="text-foreground text-2xl font-semibold">
-                  {analytics.summary.uniqueVisitors.toLocaleString()}
+                  {(analytics?.summary.uniqueVisitors ?? 0).toLocaleString()}
                 </p>
               </div>
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">Blog Page Views</p>
                 <p className="text-foreground text-2xl font-semibold">
-                  {analytics.summary.blogOverviewViews.toLocaleString()}
+                  {(analytics?.summary.blogOverviewViews ?? 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -408,7 +423,7 @@ function LiveContent({
             {/* Views Chart */}
             <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6 overflow-visible">
               <h3 className="text-foreground font-medium mb-4">Views Over Time</h3>
-              <ViewsChart data={analytics.dailyData} formatDateShort={formatDateShort} />
+              <ViewsChart data={analytics?.dailyData ?? []} formatDateShort={formatDateShort} />
             </div>
 
             {/* Two column layout for sources and top articles */}
@@ -417,7 +432,7 @@ function LiveContent({
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-foreground font-medium">Top Sources</h3>
-                  {analytics.sources.length > 5 && (
+                  {(analytics?.sources.length ?? 0) > 5 && (
                     <button
                       onClick={onShowSources}
                       className="text-primary text-sm hover:underline"
@@ -426,12 +441,12 @@ function LiveContent({
                     </button>
                   )}
                 </div>
-                {analytics.sources.length === 0 ? (
+                {(analytics?.sources.length ?? 0) === 0 ? (
                   <p className="text-muted-foreground text-sm">No traffic data yet</p>
                 ) : (
                   <div className="space-y-3">
-                    {analytics.sources.slice(0, 5).map((source) => {
-                      const totalViews = analytics.sources.reduce((sum, s) => sum + s.count, 0)
+                    {(analytics?.sources ?? []).slice(0, 5).map((source) => {
+                      const totalViews = (analytics?.sources ?? []).reduce((sum, s) => sum + s.count, 0)
                       const percentage = totalViews > 0 ? (source.count / totalViews) * 100 : 0
                       return (
                         <div key={source.referrer || 'direct'} className="relative">
@@ -458,7 +473,7 @@ function LiveContent({
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-foreground font-medium">Top Articles</h3>
-                  {analytics.topArticles.length > 5 && (
+                  {(analytics?.topArticles.length ?? 0) > 5 && (
                     <button
                       onClick={onShowArticles}
                       className="text-primary text-sm hover:underline"
@@ -467,12 +482,12 @@ function LiveContent({
                     </button>
                   )}
                 </div>
-                {analytics.topArticles.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">No article views yet</p>
+                {(analytics?.topArticles.length ?? 0) === 0 ? (
+                  <p className="text-muted-foreground text-sm">No articles yet</p>
                 ) : (
                   <div className="space-y-3">
-                    {analytics.topArticles.slice(0, 5).map((article) => {
-                      const maxViews = analytics.topArticles[0]?.views || 1
+                    {(analytics?.topArticles ?? []).slice(0, 5).map((article) => {
+                      const maxViews = analytics?.topArticles[0]?.views || 1
                       const percentage = (article.views / maxViews) * 100
                       return (
                         <div key={article.slug} className="relative">
@@ -496,10 +511,6 @@ function LiveContent({
               </div>
             </div>
           </>
-        ) : (
-          <div className="h-64 flex items-center justify-center">
-            <p className="text-muted-foreground">No analytics data available</p>
-          </div>
         )}
       </div>
 

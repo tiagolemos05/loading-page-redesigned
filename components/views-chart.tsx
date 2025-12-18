@@ -51,6 +51,14 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
     return yAxisWidth + (activeIndex * stepWidth)
   }
 
+  if (data.length === 0) {
+    return (
+      <div className="h-64 w-full flex items-center justify-center">
+        <p className="text-muted-foreground text-sm">No views data yet</p>
+      </div>
+    )
+  }
+
   return (
     <div ref={containerRef} className="h-64 w-full relative overflow-visible pr-[68px]">
       <ResponsiveContainer width="100%" height="100%">

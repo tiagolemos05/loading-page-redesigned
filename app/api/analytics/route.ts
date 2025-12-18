@@ -18,6 +18,19 @@ export async function GET(request: NextRequest) {
   const startDateStr = startDate.toISOString()
 
   try {
+    // Get all published post slugs first
+    const { data: publishedPosts } = await supabaseAdmin
+      .from('posts')
+      .select('slug, title')
+      .eq('draft', false)
+
+    const publishedSlugs = new Set((publishedPosts || []).map(p => p.slug))
+    
+    // Only include blog overview if there are published posts
+    if (publishedSlugs.size > 0) {
+      publishedSlugs.add('blog')
+    }
+
     // Get all page views within the time range
     const { data: pageViews, error: viewsError } = await supabaseAdmin
       .from('page_views')
@@ -30,8 +43,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 })
     }
 
-    // Process data for charts
-    const views = pageViews || []
+    // Filter views to only include published posts
+    const views = (pageViews || []).filter(view => publishedSlugs.has(view.slug))
 
     // 1. Daily views for line chart
     const dailyViews: Record<string, { total: number; unique: Set<string> }> = {}
@@ -78,14 +91,8 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Fetch all published posts
-    const { data: allPosts } = await supabaseAdmin
-      .from('posts')
-      .select('slug, title')
-      .eq('draft', false)
-
     // Build topArticles from all published posts, merging view counts
-    const topArticles = (allPosts || []).map(post => ({
+    const topArticles = (publishedPosts || []).map(post => ({
       slug: post.slug,
       title: post.title,
       views: articleMap[post.slug] || 0,
