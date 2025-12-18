@@ -2,7 +2,6 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllPosts, formatDate } from '@/lib/blog'
 import { BlogHeader } from '@/components/blog-header'
-import { PageTracker } from '@/components/page-tracker'
 
 export const metadata: Metadata = {
   title: 'Blog - Node Wave',
@@ -16,7 +15,6 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <PageTracker slug="blog" />
       <BlogHeader />
       
       <main className="max-w-3xl mx-auto px-6 flex-1">
