@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     views.forEach(view => {
       const dateStr = new Date(view.created_at).toISOString().split('T')[0]
-      if (dailyViews[dateStr]) {
+      if (dailyViews[dateStr] && view.slug !== 'blog') {
         dailyViews[dateStr].total++
         dailyViews[dateStr].unique.add(view.visitor_id)
       }
@@ -78,10 +78,27 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    const topArticles = Object.entries(articleMap)
+    const topArticleSlugs = Object.entries(articleMap)
       .map(([slug, views]) => ({ slug, views }))
       .sort((a, b) => b.views - a.views)
-      .slice(0, 10)
+
+    // Fetch post titles for the articles
+    const slugs = topArticleSlugs.map(a => a.slug)
+    const { data: posts } = await supabaseAdmin
+      .from('posts')
+      .select('slug, title')
+      .in('slug', slugs)
+
+    const titleMap: Record<string, string> = {}
+    posts?.forEach(post => {
+      titleMap[post.slug] = post.title
+    })
+
+    const topArticles = topArticleSlugs.map(article => ({
+      slug: article.slug,
+      title: titleMap[article.slug] || article.slug,
+      views: article.views,
+    }))
 
     // 4. Summary stats
     const totalViews = views.length

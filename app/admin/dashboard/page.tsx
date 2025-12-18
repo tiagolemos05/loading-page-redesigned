@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { SourcesModal } from '@/components/sources-modal'
+import { ArticlesModal } from '@/components/articles-modal'
 import { ViewsChart } from '@/components/views-chart'
 
 type ModalAction = {
@@ -18,7 +19,7 @@ type TimeFrame = '7' | '28' | '90' | 'all'
 type AnalyticsData = {
   dailyData: { date: string; views: number; visitors: number }[]
   sources: { referrer: string | null; count: number }[]
-  topArticles: { slug: string; views: number }[]
+  topArticles: { slug: string; title: string; views: number }[]
   summary: {
     totalViews: number
     uniqueVisitors: number
@@ -36,6 +37,7 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [showSourcesModal, setShowSourcesModal] = useState(false)
+  const [showArticlesModal, setShowArticlesModal] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -252,6 +254,7 @@ export default function AdminDashboard() {
               formatDateShort={formatDateShort}
               onAction={setModalAction}
               onShowSources={() => setShowSourcesModal(true)}
+              onShowArticles={() => setShowArticlesModal(true)}
             />
           )}
         </div>
@@ -282,6 +285,12 @@ export default function AdminDashboard() {
         isOpen={showSourcesModal}
         sources={analytics?.sources || []}
         onClose={() => setShowSourcesModal(false)}
+      />
+
+      <ArticlesModal
+        isOpen={showArticlesModal}
+        articles={analytics?.topArticles || []}
+        onClose={() => setShowArticlesModal(false)}
       />
     </div>
   )
@@ -325,6 +334,7 @@ function LiveContent({
   formatDateShort,
   onAction,
   onShowSources,
+  onShowArticles,
 }: {
   posts: Post[]
   analytics: AnalyticsData | null
@@ -334,6 +344,7 @@ function LiveContent({
   formatDateShort: (date: string) => string
   onAction: (action: ModalAction) => void
   onShowSources: () => void
+  onShowArticles: () => void
 }) {
   const timeFrameOptions: { value: TimeFrame; label: string }[] = [
     { value: '7', label: '7 days' },
@@ -445,12 +456,22 @@ function LiveContent({
 
               {/* Top Articles */}
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
-                <h3 className="text-foreground font-medium mb-4">Top Articles</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-foreground font-medium">Top Articles</h3>
+                  {analytics.topArticles.length > 5 && (
+                    <button
+                      onClick={onShowArticles}
+                      className="text-primary text-sm hover:underline"
+                    >
+                      Show all
+                    </button>
+                  )}
+                </div>
                 {analytics.topArticles.length === 0 ? (
                   <p className="text-muted-foreground text-sm">No article views yet</p>
                 ) : (
                   <div className="space-y-3">
-                    {analytics.topArticles.slice(0, 5).map((article, index) => {
+                    {analytics.topArticles.slice(0, 5).map((article) => {
                       const maxViews = analytics.topArticles[0]?.views || 1
                       const percentage = (article.views / maxViews) * 100
                       return (
@@ -461,7 +482,7 @@ function LiveContent({
                           />
                           <div className="relative flex items-center justify-between py-1.5 px-2">
                             <span className="text-foreground text-sm truncate max-w-[70%]">
-                              /{article.slug}
+                              {article.title}
                             </span>
                             <span className="text-muted-foreground text-sm tabular-nums">
                               {article.views.toLocaleString()}
