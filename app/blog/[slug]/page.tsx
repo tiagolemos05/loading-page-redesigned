@@ -9,6 +9,8 @@ interface PageProps {
   params: Promise<{ slug: string }>
 }
 
+const BASE_URL = 'https://www.nodewave.io'
+
 export const revalidate = 60
 
 export async function generateStaticParams() {
@@ -32,9 +34,65 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Post Not Found' }
   }
 
+  const postUrl = `${BASE_URL}/blog/${post.slug}`
+
   return {
     title: `${post.title} - Node Wave Blog`,
     description: post.description || '',
+    authors: post.author ? [{ name: post.author }] : undefined,
+    keywords: post.tags?.length ? post.tags : undefined,
+    openGraph: {
+      type: 'article',
+      url: postUrl,
+      title: post.title,
+      description: post.description || '',
+      publishedTime: post.published_at || post.created_at,
+      modifiedTime: post.updated_at,
+      authors: post.author ? [post.author] : undefined,
+      tags: post.tags,
+      siteName: 'Node Wave',
+    },
+    twitter: {
+      card: 'summary',
+      title: post.title,
+      description: post.description || '',
+    },
+    alternates: {
+      canonical: postUrl,
+    },
+  }
+}
+
+function generateArticleJsonLd(post: {
+  title: string
+  description: string | null
+  author: string
+  slug: string
+  published_at: string | null
+  updated_at: string
+  created_at: string
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.description || '',
+    author: {
+      '@type': 'Organization',
+      name: post.author || 'Node Wave',
+      url: BASE_URL,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Node Wave',
+      url: BASE_URL,
+    },
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${BASE_URL}/blog/${post.slug}`,
+    },
   }
 }
 
@@ -86,8 +144,14 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound()
   }
 
+  const jsonLd = generateArticleJsonLd(post)
+
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <PageTracker slug={slug} />
       <BlogHeader />
       
@@ -124,7 +188,10 @@ export default async function BlogPostPage({ params }: PageProps) {
                 <ReadingTime minutes={post.reading_time || 1} />
                 <CopyUrlButton />
               </div>
-              <time className="text-muted-foreground text-sm">
+              <time 
+                className="text-muted-foreground text-sm"
+                dateTime={new Date(post.published_at || post.created_at).toISOString()}
+              >
                 {formatDate(post.published_at || post.created_at)}
               </time>
             </div>

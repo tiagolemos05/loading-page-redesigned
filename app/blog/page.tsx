@@ -7,6 +7,20 @@ import { PageTracker } from '@/components/page-tracker'
 export const metadata: Metadata = {
   title: 'Blog - Node Wave',
   description: 'Learn about AI automation, workflow optimization, and how to streamline your business operations.',
+  openGraph: {
+    type: 'website',
+    url: 'https://www.nodewave.io/blog',
+    title: 'Blog - Node Wave',
+    description: 'Learn about AI automation, workflow optimization, and how to streamline your business operations.',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Blog - Node Wave',
+    description: 'Learn about AI automation, workflow optimization, and how to streamline your business operations.',
+  },
+  alternates: {
+    canonical: 'https://www.nodewave.io/blog',
+  },
 }
 
 export const revalidate = 60
@@ -40,7 +54,10 @@ export default async function BlogPage() {
                     href={`/blog/${post.slug}`}
                     className="group block py-8"
                   >
-                    <time className="text-muted-foreground text-sm mb-2 block">
+                    <time 
+                      className="text-muted-foreground text-sm mb-2 block"
+                      dateTime={new Date(post.published_at || post.created_at).toISOString()}
+                    >
                       {formatDate(post.published_at || post.created_at)}
                     </time>
                     <h2 className="text-foreground text-xl md:text-2xl font-medium mb-2 group-hover:text-primary transition-colors">
