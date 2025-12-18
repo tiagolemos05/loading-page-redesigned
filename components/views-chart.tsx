@@ -44,7 +44,7 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
   const getCursorPosition = () => {
     if (activeIndex === null || data.length === 0) return null
     const chartWidth = (containerRef.current?.clientWidth || 0) - 68 // subtract pr-[68px]
-    const yAxisWidth = 65
+    const yAxisWidth = 68
     const rightPadding = 10
     const availableWidth = chartWidth - yAxisWidth - rightPadding
     const stepWidth = availableWidth / (data.length - 1)
