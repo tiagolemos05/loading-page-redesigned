@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       .map(([referrer, count]) => ({ referrer: referrer === 'direct' ? null : referrer, count }))
       .sort((a, b) => b.count - a.count)
 
-    // 3. Top articles
+    // 3. Top articles - include all published posts
     const articleMap: Record<string, number> = {}
     views.forEach(view => {
       // Skip the blog overview page for article rankings
@@ -78,27 +78,18 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    const topArticleSlugs = Object.entries(articleMap)
-      .map(([slug, views]) => ({ slug, views }))
-      .sort((a, b) => b.views - a.views)
-
-    // Fetch post titles for the articles
-    const slugs = topArticleSlugs.map(a => a.slug)
-    const { data: posts } = await supabaseAdmin
+    // Fetch all published posts
+    const { data: allPosts } = await supabaseAdmin
       .from('posts')
       .select('slug, title')
-      .in('slug', slugs)
+      .eq('draft', false)
 
-    const titleMap: Record<string, string> = {}
-    posts?.forEach(post => {
-      titleMap[post.slug] = post.title
-    })
-
-    const topArticles = topArticleSlugs.map(article => ({
-      slug: article.slug,
-      title: titleMap[article.slug] || article.slug,
-      views: article.views,
-    }))
+    // Build topArticles from all published posts, merging view counts
+    const topArticles = (allPosts || []).map(post => ({
+      slug: post.slug,
+      title: post.title,
+      views: articleMap[post.slug] || 0,
+    })).sort((a, b) => b.views - a.views)
 
     // 4. Summary stats
     const totalViews = views.length
