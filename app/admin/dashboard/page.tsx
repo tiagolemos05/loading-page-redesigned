@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { SourcesModal } from '@/components/sources-modal'
 import { ArticlesModal } from '@/components/articles-modal'
+import { ShareModal } from '@/components/share-modal'
 import { ViewsChart } from '@/components/views-chart'
 
 type ModalAction = {
@@ -32,12 +33,13 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [modalAction, setModalAction] = useState<ModalAction>(null)
-  const [activeTab, setActiveTab] = useState<'drafts' | 'live'>('drafts')
+  const [activeTab, setActiveTab] = useState<'drafts' | 'live'>('live')
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('28')
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [showSourcesModal, setShowSourcesModal] = useState(false)
   const [showArticlesModal, setShowArticlesModal] = useState(false)
+  const [sharePost, setSharePost] = useState<Post | null>(null)
   const [excludeFromAnalytics, setExcludeFromAnalytics] = useState(false)
   const router = useRouter()
 
@@ -269,16 +271,6 @@ export default function AdminDashboard() {
           {/* Tabs */}
           <div className="flex gap-2 mb-8">
             <button
-              onClick={() => setActiveTab('drafts')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                activeTab === 'drafts'
-                  ? 'bg-foreground/10 text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Drafts ({draftPosts.length})
-            </button>
-            <button
               onClick={() => setActiveTab('live')}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 activeTab === 'live'
@@ -288,15 +280,20 @@ export default function AdminDashboard() {
             >
               Live ({livePosts.length})
             </button>
+            <button
+              onClick={() => setActiveTab('drafts')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === 'drafts'
+                  ? 'bg-foreground/10 text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Drafts ({draftPosts.length})
+            </button>
           </div>
 
           {/* Content */}
-          {activeTab === 'drafts' ? (
-            <DraftsList
-              posts={draftPosts}
-              onAction={setModalAction}
-            />
-          ) : (
+          {activeTab === 'live' ? (
             <LiveContent
               posts={livePosts}
               analytics={analytics}
@@ -305,8 +302,14 @@ export default function AdminDashboard() {
               setTimeFrame={setTimeFrame}
               formatDateShort={formatDateShort}
               onAction={setModalAction}
+              onShare={setSharePost}
               onShowSources={() => setShowSourcesModal(true)}
               onShowArticles={() => setShowArticlesModal(true)}
+            />
+          ) : (
+            <DraftsList
+              posts={draftPosts}
+              onAction={setModalAction}
             />
           )}
         </div>
@@ -344,16 +347,23 @@ export default function AdminDashboard() {
         articles={analytics?.topArticles || []}
         onClose={() => setShowArticlesModal(false)}
       />
+
+      <ShareModal
+        isOpen={sharePost !== null}
+        postSlug={sharePost?.slug || ''}
+        postTitle={sharePost?.title || ''}
+        onClose={() => setSharePost(null)}
+      />
     </div>
   )
 }
 
 function DraftsList({ 
   posts, 
-  onAction 
+  onAction,
 }: { 
   posts: Post[]
-  onAction: (action: ModalAction) => void 
+  onAction: (action: ModalAction) => void
 }) {
   if (posts.length === 0) {
     return (
@@ -385,6 +395,7 @@ function LiveContent({
   setTimeFrame,
   formatDateShort,
   onAction,
+  onShare,
   onShowSources,
   onShowArticles,
 }: {
@@ -395,6 +406,7 @@ function LiveContent({
   setTimeFrame: (tf: TimeFrame) => void
   formatDateShort: (date: string) => string
   onAction: (action: ModalAction) => void
+  onShare: (post: Post) => void
   onShowSources: () => void
   onShowArticles: () => void
 }) {
@@ -565,6 +577,7 @@ function LiveContent({
                 key={post.id} 
                 post={post} 
                 onAction={onAction}
+                onShare={onShare}
                 showDivider={index < posts.length - 1}
               />
             ))}
@@ -578,10 +591,12 @@ function LiveContent({
 function PostItem({ 
   post, 
   onAction,
+  onShare,
   showDivider,
 }: { 
   post: Post
   onAction: (action: ModalAction) => void
+  onShare?: (post: Post) => void
   showDivider: boolean
 }) {
   return (
@@ -623,6 +638,14 @@ function PostItem({
           >
             Edit
           </Link>
+          {onShare && (
+            <button
+              onClick={() => onShare(post)}
+              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-foreground/[0.06] rounded transition-colors"
+            >
+              Share
+            </button>
+          )}
           <button
             onClick={() => onAction({ type: post.draft ? 'publish' : 'unpublish', post })}
             className={`px-3 py-1.5 text-sm rounded transition-colors ${

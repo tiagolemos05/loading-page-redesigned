@@ -18,6 +18,35 @@ function isExcludedFromAnalytics(): boolean {
   return localStorage.getItem('nw_exclude_analytics') === 'true'
 }
 
+function getTrafficSource(): string {
+  if (typeof window === 'undefined') return 'direct'
+  
+  const params = new URLSearchParams(window.location.search)
+  const utmSource = params.get('utm_source')
+  const utmMedium = params.get('utm_medium')
+  const utmCampaign = params.get('utm_campaign')
+  
+  // If UTM source exists, use it (optionally with medium/campaign)
+  if (utmSource) {
+    let source = utmSource
+    if (utmMedium) source += ` / ${utmMedium}`
+    if (utmCampaign) source += ` / ${utmCampaign}`
+    return source
+  }
+  
+  // Fall back to referrer
+  if (document.referrer) {
+    try {
+      const url = new URL(document.referrer)
+      return url.hostname
+    } catch {
+      return document.referrer
+    }
+  }
+  
+  return 'direct'
+}
+
 interface PageTrackerProps {
   slug: string
 }
@@ -34,7 +63,7 @@ export function PageTracker({ slug }: PageTrackerProps) {
       const visitorId = getVisitorId()
       if (!visitorId) return
 
-      const referrer = document.referrer || 'direct'
+      const referrer = getTrafficSource()
 
       try {
         await fetch('/api/track', {
