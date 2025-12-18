@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 function getVisitorId(): string {
   if (typeof window === 'undefined') return ''
@@ -18,7 +18,12 @@ interface PageTrackerProps {
 }
 
 export function PageTracker({ slug }: PageTrackerProps) {
+  const tracked = useRef(false)
+
   useEffect(() => {
+    if (tracked.current) return
+    tracked.current = true
+
     const trackView = async () => {
       const visitorId = getVisitorId()
       if (!visitorId) return
