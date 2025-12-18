@@ -13,6 +13,11 @@ function getVisitorId(): string {
   return visitorId
 }
 
+function isExcludedFromAnalytics(): boolean {
+  if (typeof window === 'undefined') return false
+  return localStorage.getItem('nw_exclude_analytics') === 'true'
+}
+
 interface PageTrackerProps {
   slug: string
 }
@@ -22,6 +27,7 @@ export function PageTracker({ slug }: PageTrackerProps) {
 
   useEffect(() => {
     if (tracked.current) return
+    if (isExcludedFromAnalytics()) return
     tracked.current = true
 
     const trackView = async () => {
