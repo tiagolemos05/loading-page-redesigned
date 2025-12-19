@@ -144,7 +144,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const jsonLd = generateArticleJsonLd(post)
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
