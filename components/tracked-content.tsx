@@ -4,9 +4,10 @@ import { useEffect, useRef } from 'react'
 import { getVisitorIdClient, isExcluded } from './page-tracker'
 
 const TRACKED_URLS = [
-  'https://www.nodewave.io/#contact-section',
+  'nodewave.io/#contact-section',
   '/#contact-section',
-  'https://cal.com/tiago-lemos-p1wrn8/30min',
+  '#contact-section',
+  'cal.com/tiago-lemos-p1wrn8/30min',
 ]
 
 interface TrackedContentProps {
@@ -32,9 +33,7 @@ export function TrackedContent({ slug, html, className }: TrackedContentProps) {
       if (!href) return
 
       // Check if this is a tracked URL
-      const isTracked = TRACKED_URLS.some(url => 
-        href === url || href.endsWith(url) || url.endsWith(href)
-      )
+      const isTracked = TRACKED_URLS.some(url => href.includes(url))
 
       if (!isTracked) return
       if (isExcluded()) return
