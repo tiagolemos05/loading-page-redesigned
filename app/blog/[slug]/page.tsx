@@ -5,6 +5,7 @@ import { getPostBySlug, getAllPosts, formatDate } from '@/lib/blog'
 import { BlogHeader, BlogBackLink, CopyUrlButton, ReadingTime } from '@/components/blog-header'
 import { PageTracker } from '@/components/page-tracker'
 import { BlogCTABox } from '@/components/blog-cta-box'
+import { BlogFooter } from '@/components/blog-footer'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -231,16 +232,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         </div>
       </main>
 
-      <footer className="py-8">
-        <div className="max-w-[1320px] mx-auto px-6 flex items-center justify-between">
-          <Link href="/blog" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-            ← Back to blog
-          </Link>
-          <Link href="/#contact-section" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-            Get in touch
-          </Link>
-        </div>
-      </footer>
+      <BlogFooter slug={slug} />
     </div>
   )
 }
