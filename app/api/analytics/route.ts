@@ -25,11 +25,6 @@ export async function GET(request: NextRequest) {
       .eq('draft', false)
 
     const publishedSlugs = new Set((publishedPosts || []).map(p => p.slug))
-    
-    // Only include blog overview if there are published posts
-    if (publishedSlugs.size > 0) {
-      publishedSlugs.add('blog')
-    }
 
     // Get all page views within the time range
     const { data: pageViews, error: viewsError } = await supabaseAdmin
@@ -43,8 +38,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 })
     }
 
-    // Filter views to only include published posts
+    // Filter views to only include published posts (not blog overview)
     const views = (pageViews || []).filter(view => publishedSlugs.has(view.slug))
+    
+    // Get blog overview views separately
+    const blogViews = (pageViews || []).filter(view => view.slug === 'blog')
 
     // Get all CTA clicks within the time range
     const { data: ctaClicks, error: ctaError } = await supabaseAdmin
@@ -139,10 +137,11 @@ export async function GET(request: NextRequest) {
       author: post.author || 'Node Wave',
     })).sort((a, b) => b.views - a.views)
 
-    // 4. Summary stats
+    // 4. Summary stats - only count article views, not blog overview
     const totalViews = views.length
     const uniqueVisitors = new Set(views.map(v => v.visitor_id)).size
-    const blogOverviewViews = views.filter(v => v.slug === 'blog').length
+    // Only count blog overview views if there are published posts
+    const blogOverviewViews = publishedSlugs.size > 0 ? blogViews.length : 0
     const totalCtaClicks = clicks.length
 
     return NextResponse.json({
