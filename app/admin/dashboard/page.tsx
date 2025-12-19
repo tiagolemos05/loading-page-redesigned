@@ -20,11 +20,12 @@ type TimeFrame = '7' | '28' | '90' | 'all'
 type AnalyticsData = {
   dailyData: { date: string; views: number; visitors: number; tiago: number; vicente: number }[]
   sources: { referrer: string | null; count: number }[]
-  topArticles: { slug: string; title: string; views: number; author: string }[]
+  topArticles: { slug: string; title: string; views: number; clicks: number; author: string }[]
   summary: {
     totalViews: number
     uniqueVisitors: number
     blogOverviewViews: number
+    totalCtaClicks: number
   }
 }
 
@@ -448,7 +449,7 @@ function LiveContent({
         ) : (
           <>
             {/* Summary Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">Total Views</p>
                 <p className="text-foreground text-2xl font-semibold">
@@ -465,6 +466,12 @@ function LiveContent({
                 <p className="text-muted-foreground text-sm mb-1">Blog Page Views</p>
                 <p className="text-foreground text-2xl font-semibold">
                   {(analytics?.summary.blogOverviewViews ?? 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
+                <p className="text-muted-foreground text-sm mb-1">CTA Clicks</p>
+                <p className="text-foreground text-2xl font-semibold">
+                  {(analytics?.summary.totalCtaClicks ?? 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -536,7 +543,7 @@ function LiveContent({
 
               {/* Top Articles */}
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2">
                   <h3 className="text-foreground font-medium">Top Articles</h3>
                   {(analytics?.topArticles.length ?? 0) > 5 && (
                     <button
@@ -547,6 +554,13 @@ function LiveContent({
                     </button>
                   )}
                 </div>
+                <div className="flex items-center justify-between px-2 mb-2">
+                  <span className="text-muted-foreground/50 text-xs">Article</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-muted-foreground/50 text-xs">Views</span>
+                    <span className="text-muted-foreground/50 text-xs w-14 text-right">CTR</span>
+                  </div>
+                </div>
                 {(analytics?.topArticles.length ?? 0) === 0 ? (
                   <p className="text-muted-foreground text-sm">No articles yet</p>
                 ) : (
@@ -554,6 +568,7 @@ function LiveContent({
                     {(analytics?.topArticles ?? []).slice(0, 5).map((article) => {
                       const maxViews = analytics?.topArticles[0]?.views || 1
                       const percentage = (article.views / maxViews) * 100
+                      const ctr = article.views > 0 ? ((article.clicks / article.views) * 100).toFixed(1) : '0.0'
                       const authorColor = article.author === 'Tiago' 
                         ? 'rgba(30, 64, 175, 0.15)' 
                         : article.author === 'Vicente' 
@@ -566,7 +581,7 @@ function LiveContent({
                             style={{ width: `${percentage}%`, background: authorColor }}
                           />
                           <div className="relative flex items-center justify-between py-1.5 px-2">
-                            <div className="flex items-center gap-2 truncate max-w-[70%]">
+                            <div className="flex items-center gap-2 truncate max-w-[55%]">
                               <span 
                                 className="w-2 h-2 rounded-full flex-shrink-0" 
                                 style={{ 
@@ -581,9 +596,14 @@ function LiveContent({
                                 {article.title}
                               </span>
                             </div>
-                            <span className="text-muted-foreground text-sm tabular-nums">
-                              {article.views.toLocaleString()}
-                            </span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-muted-foreground text-sm tabular-nums">
+                                {article.views.toLocaleString()}
+                              </span>
+                              <span className="text-muted-foreground text-sm tabular-nums w-14 text-right">
+                                {ctr}%
+                              </span>
+                            </div>
                           </div>
                         </div>
                       )

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getPostBySlug, getAllPosts, formatDate } from '@/lib/blog'
 import { BlogHeader, BlogBackLink, CopyUrlButton, ReadingTime } from '@/components/blog-header'
 import { PageTracker } from '@/components/page-tracker'
+import { BlogCTABox } from '@/components/blog-cta-box'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -225,20 +226,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
           {/* CTA box */}
           <div className="mt-16 relative z-10">
-            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-8">
-              <h3 className="text-foreground text-xl font-semibold mb-2">
-                Ready to automate your workflows?
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                Let&apos;s discuss how we can streamline your business operations.
-              </p>
-              <Link 
-                href="/#contact-section"
-                className="inline-flex items-center text-primary hover:underline font-medium"
-              >
-                Get in touch →
-              </Link>
-            </div>
+            <BlogCTABox slug={slug} />
           </div>
         </div>
       </main>

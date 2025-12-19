@@ -51,6 +51,14 @@ interface PageTrackerProps {
   slug: string
 }
 
+export function getVisitorIdClient(): string {
+  return getVisitorId()
+}
+
+export function isExcluded(): boolean {
+  return isExcludedFromAnalytics()
+}
+
 export function PageTracker({ slug }: PageTrackerProps) {
   const tracked = useRef(false)
 

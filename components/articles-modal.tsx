@@ -6,6 +6,7 @@ interface ArticleData {
   slug: string
   title: string
   views: number
+  clicks: number
   author: string
 }
 
@@ -65,6 +66,7 @@ export function ArticlesModal({ isOpen, articles, onClose }: ArticlesModalProps)
             <div className="space-y-3">
               {articles.map((article, index) => {
                 const percentage = (article.views / maxViews) * 100
+                const ctr = article.views > 0 ? ((article.clicks / article.views) * 100).toFixed(1) : '0.0'
                 const authorColor = article.author === 'Tiago' 
                   ? 'rgba(30, 64, 175, 0.15)' 
                   : article.author === 'Vicente' 
@@ -93,9 +95,14 @@ export function ArticlesModal({ isOpen, articles, onClose }: ArticlesModalProps)
                           {article.title}
                         </span>
                       </div>
-                      <span className="text-foreground font-medium tabular-nums flex-shrink-0 ml-4">
-                        {article.views.toLocaleString()}
-                      </span>
+                      <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                        <span className="text-foreground font-medium tabular-nums">
+                          {article.views.toLocaleString()}
+                        </span>
+                        <span className="text-muted-foreground tabular-nums w-14 text-right">
+                          {ctr}%
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )

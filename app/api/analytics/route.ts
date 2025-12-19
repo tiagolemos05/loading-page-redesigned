@@ -46,6 +46,19 @@ export async function GET(request: NextRequest) {
     // Filter views to only include published posts
     const views = (pageViews || []).filter(view => publishedSlugs.has(view.slug))
 
+    // Get all CTA clicks within the time range
+    const { data: ctaClicks, error: ctaError } = await supabaseAdmin
+      .from('cta_clicks')
+      .select('*')
+      .gte('created_at', startDateStr)
+
+    if (ctaError) {
+      console.error('Error fetching CTA clicks:', ctaError)
+    }
+
+    // Filter CTA clicks to only include published posts
+    const clicks = (ctaClicks || []).filter(click => publishedSlugs.has(click.slug))
+
     // Create a map of slug to author
     const slugToAuthor: Record<string, string> = {}
     ;(publishedPosts || []).forEach(post => {
@@ -111,11 +124,18 @@ export async function GET(request: NextRequest) {
       }
     })
 
+    // Count CTA clicks per article
+    const ctaMap: Record<string, number> = {}
+    clicks.forEach(click => {
+      ctaMap[click.slug] = (ctaMap[click.slug] || 0) + 1
+    })
+
     // Build topArticles from all published posts, merging view counts
     const topArticles = (publishedPosts || []).map(post => ({
       slug: post.slug,
       title: post.title,
       views: articleMap[post.slug] || 0,
+      clicks: ctaMap[post.slug] || 0,
       author: post.author || 'Node Wave',
     })).sort((a, b) => b.views - a.views)
 
@@ -123,6 +143,7 @@ export async function GET(request: NextRequest) {
     const totalViews = views.length
     const uniqueVisitors = new Set(views.map(v => v.visitor_id)).size
     const blogOverviewViews = views.filter(v => v.slug === 'blog').length
+    const totalCtaClicks = clicks.length
 
     return NextResponse.json({
       dailyData,
@@ -132,6 +153,7 @@ export async function GET(request: NextRequest) {
         totalViews,
         uniqueVisitors,
         blogOverviewViews,
+        totalCtaClicks,
       },
     })
   } catch (error) {
