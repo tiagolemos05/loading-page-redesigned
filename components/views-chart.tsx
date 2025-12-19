@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react'
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 
 interface ViewsChartProps {
-  data: { date: string; views: number; visitors: number }[]
+  data: { date: string; views: number; visitors: number; tiago: number; vicente: number }[]
   formatDateShort: (date: string) => string
 }
 
@@ -13,6 +13,8 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
     active: boolean
     date: string
     views: number
+    tiago: number
+    vicente: number
   } | null>(null)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   
@@ -31,6 +33,8 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
         active: true,
         date: payload.date,
         views: payload.views,
+        tiago: payload.tiago,
+        vicente: payload.vicente,
       })
     }
   }, [])
@@ -72,6 +76,14 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
               <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
               <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
             </linearGradient>
+            <linearGradient id="fillTiago" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#1e40af" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#1e40af" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="fillVicente" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#991b1b" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#991b1b" stopOpacity={0} />
+            </linearGradient>
           </defs>
           <XAxis 
           dataKey="date" 
@@ -90,6 +102,20 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
             dataKey="views"
             stroke="hsl(var(--primary))"
             fill="url(#fillViews)"
+            strokeWidth={2}
+          />
+          <Area
+            type="monotone"
+            dataKey="tiago"
+            stroke="#1e40af"
+            fill="url(#fillTiago)"
+            strokeWidth={2}
+          />
+          <Area
+            type="monotone"
+            dataKey="vicente"
+            stroke="#991b1b"
+            fill="url(#fillVicente)"
             strokeWidth={2}
           />
         </AreaChart>
@@ -122,12 +148,23 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
       >
         {tooltipData && (
           <div className="bg-background border border-foreground/10 rounded-lg px-3 py-2 shadow-xl">
-            <p className="text-muted-foreground text-xs mb-1">
+            <p className="text-muted-foreground text-xs mb-2">
               {formatDateShort(tooltipData.date)}
             </p>
-            <p className="text-foreground text-sm font-medium">
-              {tooltipData.views.toLocaleString()} views
-            </p>
+            <div className="space-y-1">
+              <p className="text-sm font-medium flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full" style={{ background: 'hsl(var(--primary))' }}></span>
+                <span className="text-foreground">{tooltipData.views.toLocaleString()} total</span>
+              </p>
+              <p className="text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full" style={{ background: '#1e40af' }}></span>
+                <span className="text-foreground/80">{tooltipData.tiago.toLocaleString()} Tiago</span>
+              </p>
+              <p className="text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full" style={{ background: '#991b1b' }}></span>
+                <span className="text-foreground/80">{tooltipData.vicente.toLocaleString()} Vicente</span>
+              </p>
+            </div>
           </div>
         )}
       </div>

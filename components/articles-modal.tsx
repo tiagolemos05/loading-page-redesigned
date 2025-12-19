@@ -6,6 +6,7 @@ interface ArticleData {
   slug: string
   title: string
   views: number
+  author: string
 }
 
 interface ArticlesModalProps {
@@ -64,15 +65,30 @@ export function ArticlesModal({ isOpen, articles, onClose }: ArticlesModalProps)
             <div className="space-y-3">
               {articles.map((article, index) => {
                 const percentage = (article.views / maxViews) * 100
+                const authorColor = article.author === 'Tiago' 
+                  ? 'rgba(30, 64, 175, 0.15)' 
+                  : article.author === 'Vicente' 
+                    ? 'rgba(153, 27, 27, 0.15)' 
+                    : 'hsl(var(--primary) / 0.1)'
                 return (
                   <div key={article.slug} className="relative">
                     <div 
-                      className="absolute inset-0 bg-primary/10 rounded"
-                      style={{ width: `${percentage}%` }}
+                      className="absolute inset-0 rounded"
+                      style={{ width: `${percentage}%`, background: authorColor }}
                     />
                     <div className="relative flex items-center justify-between py-2 px-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <span className="text-muted-foreground text-sm w-6 flex-shrink-0">{index + 1}</span>
+                        <span 
+                          className="w-2 h-2 rounded-full flex-shrink-0" 
+                          style={{ 
+                            background: article.author === 'Tiago' 
+                              ? '#1e40af' 
+                              : article.author === 'Vicente' 
+                                ? '#991b1b' 
+                                : 'hsl(var(--primary))' 
+                          }}
+                        />
                         <span className="text-foreground truncate">
                           {article.title}
                         </span>

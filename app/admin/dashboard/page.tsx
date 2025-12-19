@@ -18,9 +18,9 @@ type ModalAction = {
 type TimeFrame = '7' | '28' | '90' | 'all'
 
 type AnalyticsData = {
-  dailyData: { date: string; views: number; visitors: number }[]
+  dailyData: { date: string; views: number; visitors: number; tiago: number; vicente: number }[]
   sources: { referrer: string | null; count: number }[]
-  topArticles: { slug: string; title: string; views: number }[]
+  topArticles: { slug: string; title: string; views: number; author: string }[]
   summary: {
     totalViews: number
     uniqueVisitors: number
@@ -471,7 +471,23 @@ function LiveContent({
 
             {/* Views Chart */}
             <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6 overflow-visible">
-              <h3 className="text-foreground font-medium mb-4">Views Over Time</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-foreground font-medium">Views Over Time</h3>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full" style={{ background: 'hsl(var(--primary))' }} />
+                    <span className="text-muted-foreground">Total</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full" style={{ background: '#1e40af' }} />
+                    <span className="text-muted-foreground">Tiago</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full" style={{ background: '#991b1b' }} />
+                    <span className="text-muted-foreground">Vicente</span>
+                  </div>
+                </div>
+              </div>
               <ViewsChart data={analytics?.dailyData ?? []} formatDateShort={formatDateShort} />
             </div>
 
@@ -538,16 +554,33 @@ function LiveContent({
                     {(analytics?.topArticles ?? []).slice(0, 5).map((article) => {
                       const maxViews = analytics?.topArticles[0]?.views || 1
                       const percentage = (article.views / maxViews) * 100
+                      const authorColor = article.author === 'Tiago' 
+                        ? 'rgba(30, 64, 175, 0.15)' 
+                        : article.author === 'Vicente' 
+                          ? 'rgba(153, 27, 27, 0.15)' 
+                          : 'hsl(var(--primary) / 0.1)'
                       return (
                         <div key={article.slug} className="relative">
                           <div 
-                            className="absolute inset-0 bg-primary/10 rounded"
-                            style={{ width: `${percentage}%` }}
+                            className="absolute inset-0 rounded"
+                            style={{ width: `${percentage}%`, background: authorColor }}
                           />
                           <div className="relative flex items-center justify-between py-1.5 px-2">
-                            <span className="text-foreground text-sm truncate max-w-[70%]">
-                              {article.title}
-                            </span>
+                            <div className="flex items-center gap-2 truncate max-w-[70%]">
+                              <span 
+                                className="w-2 h-2 rounded-full flex-shrink-0" 
+                                style={{ 
+                                  background: article.author === 'Tiago' 
+                                    ? '#1e40af' 
+                                    : article.author === 'Vicente' 
+                                      ? '#991b1b' 
+                                      : 'hsl(var(--primary))' 
+                                }}
+                              />
+                              <span className="text-foreground text-sm truncate">
+                                {article.title}
+                              </span>
+                            </div>
                             <span className="text-muted-foreground text-sm tabular-nums">
                               {article.views.toLocaleString()}
                             </span>

@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     // Get all published post slugs first
     const { data: publishedPosts } = await supabaseAdmin
       .from('posts')
-      .select('slug, title')
+      .select('slug, title, author')
       .eq('draft', false)
 
     const publishedSlugs = new Set((publishedPosts || []).map(p => p.slug))
@@ -46,15 +46,26 @@ export async function GET(request: NextRequest) {
     // Filter views to only include published posts
     const views = (pageViews || []).filter(view => publishedSlugs.has(view.slug))
 
-    // 1. Daily views for line chart
-    const dailyViews: Record<string, { total: number; unique: Set<string> }> = {}
+    // Create a map of slug to author
+    const slugToAuthor: Record<string, string> = {}
+    ;(publishedPosts || []).forEach(post => {
+      slugToAuthor[post.slug] = post.author || 'Node Wave'
+    })
+
+    // 1. Daily views for line chart - split by author
+    const dailyViews: Record<string, { 
+      total: number
+      unique: Set<string>
+      tiago: number
+      vicente: number
+    }> = {}
     
     // Initialize all days in range
     for (let i = 0; i <= days; i++) {
       const date = new Date()
       date.setDate(date.getDate() - (days - i))
       const dateStr = date.toISOString().split('T')[0]
-      dailyViews[dateStr] = { total: 0, unique: new Set() }
+      dailyViews[dateStr] = { total: 0, unique: new Set(), tiago: 0, vicente: 0 }
     }
 
     views.forEach(view => {
@@ -62,6 +73,13 @@ export async function GET(request: NextRequest) {
       if (dailyViews[dateStr] && view.slug !== 'blog') {
         dailyViews[dateStr].total++
         dailyViews[dateStr].unique.add(view.visitor_id)
+        
+        const author = slugToAuthor[view.slug] || 'Node Wave'
+        if (author === 'Tiago') {
+          dailyViews[dateStr].tiago++
+        } else if (author === 'Vicente') {
+          dailyViews[dateStr].vicente++
+        }
       }
     })
 
@@ -69,6 +87,8 @@ export async function GET(request: NextRequest) {
       date,
       views: data.total,
       visitors: data.unique.size,
+      tiago: data.tiago,
+      vicente: data.vicente,
     }))
 
     // 2. Traffic sources
@@ -96,6 +116,7 @@ export async function GET(request: NextRequest) {
       slug: post.slug,
       title: post.title,
       views: articleMap[post.slug] || 0,
+      author: post.author || 'Node Wave',
     })).sort((a, b) => b.views - a.views)
 
     // 4. Summary stats
