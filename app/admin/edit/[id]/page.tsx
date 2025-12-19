@@ -75,7 +75,7 @@ export default function EditPost() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
       <header className="w-full py-6 px-6">
         <div className="w-full max-w-[1320px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">

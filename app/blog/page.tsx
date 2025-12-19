@@ -29,7 +29,7 @@ export default async function BlogPage() {
   const posts = await getAllPosts()
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
       {posts.length > 0 && <PageTracker slug="blog" />}
       <BlogHeader />
       

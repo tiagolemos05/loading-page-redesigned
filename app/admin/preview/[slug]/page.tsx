@@ -103,7 +103,7 @@ export default function AdminPreview() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Preview banner */}
       <div className="bg-yellow-500/20 border-b border-yellow-500/30 py-2 px-6">
         <div className="max-w-[1320px] mx-auto flex items-center justify-between">
