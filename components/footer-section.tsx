@@ -45,9 +45,6 @@ export function FooterSection() {
         <div className="flex flex-col justify-start items-start gap-3">
           <h3 className="text-muted-foreground text-sm font-medium leading-5">Company</h3>
           <div className="flex flex-col justify-center items-start gap-2">
-            <a href="#" className="text-foreground text-sm font-normal leading-5 hover:underline">
-              About us
-            </a>
             <a href="/blog" className="text-foreground text-sm font-normal leading-5 hover:underline">
               Blog
             </a>
@@ -55,8 +52,7 @@ export function FooterSection() {
               Contact
             </a>
             <a href="mailto:tiagolemos@nodewave.io" className="text-foreground text-sm font-normal leading-5 hover:underline">
-              <span className="min-[400px]:hidden">Email</span>
-              <span className="hidden min-[400px]:inline">tiagolemos@nodewave.io</span>
+              Contact Support
             </a>
           </div>
         </div>
