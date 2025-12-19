@@ -9,6 +9,7 @@ import { SourcesModal } from '@/components/sources-modal'
 import { ArticlesModal } from '@/components/articles-modal'
 import { ShareModal } from '@/components/share-modal'
 import { ViewsChart } from '@/components/views-chart'
+import { AddPostPanel } from '@/components/add-post-panel'
 
 type ModalAction = {
   type: 'publish' | 'unpublish' | 'delete'
@@ -42,6 +43,7 @@ export default function AdminDashboard() {
   const [showArticlesModal, setShowArticlesModal] = useState(false)
   const [sharePost, setSharePost] = useState<Post | null>(null)
   const [excludeFromAnalytics, setExcludeFromAnalytics] = useState(false)
+  const [showAddPostPanel, setShowAddPostPanel] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -270,26 +272,37 @@ export default function AdminDashboard() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-8">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('live')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  activeTab === 'live'
+                    ? 'bg-foreground/10 text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Live ({livePosts.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('drafts')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  activeTab === 'drafts'
+                    ? 'bg-foreground/10 text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Drafts ({draftPosts.length})
+              </button>
+            </div>
             <button
-              onClick={() => setActiveTab('live')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                activeTab === 'live'
-                  ? 'bg-foreground/10 text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+              onClick={() => setShowAddPostPanel(true)}
+              className="px-4 py-2 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 transition-colors flex items-center gap-2"
             >
-              Live ({livePosts.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('drafts')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                activeTab === 'drafts'
-                  ? 'bg-foreground/10 text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Drafts ({draftPosts.length})
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Post
             </button>
           </div>
 
@@ -355,6 +368,15 @@ export default function AdminDashboard() {
         postTitle={sharePost?.title || ''}
         onClose={() => setSharePost(null)}
       />
+
+      <AddPostPanel
+        isOpen={showAddPostPanel}
+        onClose={() => setShowAddPostPanel(false)}
+        onPostCreated={() => {
+          fetchPosts()
+          setActiveTab('drafts')
+        }}
+      />
     </div>
   )
 }
@@ -368,7 +390,7 @@ function DraftsList({
 }) {
   if (posts.length === 0) {
     return (
-      <div className="py-16 text-center">
+      <div className="py-12 text-center">
         <p className="text-muted-foreground">No drafts yet.</p>
       </div>
     )

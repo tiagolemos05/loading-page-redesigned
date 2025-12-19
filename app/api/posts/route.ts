@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 function calculateReadingTime(content: string): number {
   const wordsPerMinute = 200
@@ -14,12 +15,34 @@ function generateSlug(title: string): string {
     .replace(/^-|-$/g, '')
 }
 
-export async function POST(request: NextRequest) {
-  // Verify API key
+async function verifyAuth(request: NextRequest): Promise<boolean> {
   const authHeader = request.headers.get('authorization')
-  const apiKey = process.env.API_SECRET_KEY
+  if (!authHeader) return false
 
-  if (!authHeader || authHeader !== `Bearer ${apiKey}`) {
+  const token = authHeader.replace('Bearer ', '')
+  
+  // Check if it's the API key
+  if (token === process.env.API_SECRET_KEY) {
+    return true
+  }
+
+  // Check if it's a valid Supabase session token
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    const { data: { user }, error } = await supabase.auth.getUser(token)
+    return !error && !!user
+  } catch {
+    return false
+  }
+}
+
+export async function POST(request: NextRequest) {
+  // Verify auth (API key or Supabase session)
+  const isAuthorized = await verifyAuth(request)
+  if (!isAuthorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
