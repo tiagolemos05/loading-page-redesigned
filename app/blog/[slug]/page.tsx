@@ -6,6 +6,7 @@ import { BlogHeader, BlogBackLink, CopyUrlButton, ReadingTime } from '@/componen
 import { PageTracker } from '@/components/page-tracker'
 import { BlogCTABox } from '@/components/blog-cta-box'
 import { BlogFooter } from '@/components/blog-footer'
+import { TrackedContent } from '@/components/tracked-content'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -203,7 +204,9 @@ export default async function BlogPostPage({ params }: PageProps) {
 
           {/* Article content */}
           <article className="relative z-10">
-            <div 
+            <TrackedContent 
+              slug={slug}
+              html={post.contentHtml}
               className="prose prose-invert prose-lg max-w-none
                 prose-headings:text-foreground prose-headings:font-semibold
                 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
@@ -216,7 +219,6 @@ export default async function BlogPostPage({ params }: PageProps) {
                 prose-ul:text-muted-foreground prose-ol:text-muted-foreground
                 prose-li:marker:text-primary/50
                 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-blockquote:italic"
-              dangerouslySetInnerHTML={{ __html: post.contentHtml }}
             />
           </article>
 

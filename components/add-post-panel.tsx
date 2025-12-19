@@ -88,12 +88,12 @@ ${Object.entries(FIELD_HINTS).map(([field, info]) => `• ${field}:
   - SEO impact: ${info.seoImpact}
   - Guidelines: ${info.hint}`).join('\n\n')}
 
-In-content CTAs:
-When appropriate, include inline calls-to-action within the content itself to drive engagement before readers reach the bottom CTA. Use these URLs:
-• For a free process analysis (no commitment): https://www.nodewave.io/#contact-section
-• For scheduling a 30-minute consultation call: https://cal.com/tiago-lemos-p1wrn8/30min
+In-content CTAs (automatically tracked when clicked):
+When appropriate, include inline calls-to-action within the content to drive engagement. These links are automatically tracked as CTA clicks:
+• Free process analysis (no commitment): https://www.nodewave.io/#contact-section
+• Schedule a 30-minute consultation: https://cal.com/tiago-lemos-p1wrn8/30min
 
-Example inline CTA: "Want us to analyze your current workflow? [Get in touch](https://www.nodewave.io/#contact-section) for a free assessment."`
+Example: "Want us to analyze your current workflow? [Get in touch](https://www.nodewave.io/#contact-section) for a free assessment."`
 
   const copyToClipboard = async (text: string, type: 'example' | 'prompt') => {
     await navigator.clipboard.writeText(text)

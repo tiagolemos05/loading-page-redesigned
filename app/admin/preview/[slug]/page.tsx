@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { remark } from 'remark'
 import html from 'remark-html'
 import gfm from 'remark-gfm'
+import { TrackedContent } from '@/components/tracked-content'
 
 function ContentGrid() {
   return (
@@ -172,7 +173,9 @@ export default function AdminPreview() {
           )}
 
           <article className="relative z-10">
-            <div 
+            <TrackedContent 
+              slug={slug}
+              html={contentHtml}
               className="prose prose-invert prose-lg max-w-none
                 prose-headings:text-foreground prose-headings:font-semibold
                 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
@@ -185,7 +188,6 @@ export default function AdminPreview() {
                 prose-ul:text-muted-foreground prose-ol:text-muted-foreground
                 prose-li:marker:text-primary/50
                 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-blockquote:italic"
-              dangerouslySetInnerHTML={{ __html: contentHtml }}
             />
           </article>
 
