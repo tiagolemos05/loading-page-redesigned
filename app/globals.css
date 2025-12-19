@@ -173,3 +173,9 @@
   list-style: none;
   margin-left: -1.5rem;
 }
+
+/* Hide grid lines behind code blocks */
+.prose pre {
+  background-color: hsl(210 11% 7%) !important;
+  position: relative;
+}

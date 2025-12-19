@@ -687,6 +687,23 @@ function PostItem({
           >
             {post.draft ? 'Draft' : 'Published'}
           </span>
+          <span
+            className="px-2 py-0.5 text-xs rounded"
+            style={{
+              background: post.author === 'Tiago'
+                ? 'rgba(30, 64, 175, 0.2)'
+                : post.author === 'Vicente'
+                  ? 'rgba(153, 27, 27, 0.2)'
+                  : 'hsl(var(--primary) / 0.2)',
+              color: post.author === 'Tiago'
+                ? '#3b82f6'
+                : post.author === 'Vicente'
+                  ? '#ef4444'
+                  : 'hsl(var(--primary))'
+            }}
+          >
+            {post.author || 'Node Wave'}
+          </span>
           <span className="text-muted-foreground text-sm">
             {post.reading_time} min read
           </span>

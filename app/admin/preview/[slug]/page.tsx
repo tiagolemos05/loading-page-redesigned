@@ -11,24 +11,32 @@ import gfm from 'remark-gfm'
 function ContentGrid() {
   return (
     <div className="absolute inset-0 pointer-events-none hidden md:block overflow-visible" style={{ left: '-80px', right: '-80px' }}>
-      <div 
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `linear-gradient(to right, hsl(var(--foreground) / 0.06) 1px, transparent 1px)`,
-          backgroundSize: '33.333% 100%',
-          backgroundPosition: 'left',
-        }}
-      />
+      {/* Outer vertical lines (left and right edges) */}
+      <div className="absolute top-0 bottom-0 left-0 w-px bg-foreground/[0.06]" />
       <div className="absolute top-0 bottom-0 right-0 w-px bg-foreground/[0.06]" />
+      
+      {/* Middle vertical lines (hidden) */}
+      <div className="absolute top-0 bottom-0 w-px bg-foreground/[0]" style={{ left: '33.333%' }} />
+      <div className="absolute top-0 bottom-0 w-px bg-foreground/[0]" style={{ left: '66.666%' }} />
+      
+      {/* Top horizontal line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-foreground/[0.06]" />
+      {/* Bottom horizontal line */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-foreground/[0.06]" />
       
+      {/* Corner markers - top left */}
       <div className="absolute w-[15px] h-[3px] bg-foreground/30" style={{ top: '-1px', left: '-1px' }} />
       <div className="absolute w-[3px] h-[12px] bg-foreground/30" style={{ top: '2px', left: '-1px' }} />
+      
+      {/* Corner markers - top right */}
       <div className="absolute w-[15px] h-[3px] bg-foreground/30" style={{ top: '-1px', right: '-1px' }} />
       <div className="absolute w-[3px] h-[12px] bg-foreground/30" style={{ top: '2px', right: '-1px' }} />
+      
+      {/* Corner markers - bottom left */}
       <div className="absolute w-[15px] h-[3px] bg-foreground/30" style={{ bottom: '-1px', left: '-1px' }} />
       <div className="absolute w-[3px] h-[12px] bg-foreground/30" style={{ bottom: '2px', left: '-1px' }} />
+      
+      {/* Corner markers - bottom right */}
       <div className="absolute w-[15px] h-[3px] bg-foreground/30" style={{ bottom: '-1px', right: '-1px' }} />
       <div className="absolute w-[3px] h-[12px] bg-foreground/30" style={{ bottom: '2px', right: '-1px' }} />
     </div>
@@ -182,7 +190,10 @@ export default function AdminPreview() {
           </article>
 
           <div className="mt-16 relative z-10">
-            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-8">
+            <div 
+              className="border border-foreground/[0.06] rounded-xl p-8"
+              style={{ backgroundColor: '#111413' }}
+            >
               <h3 className="text-foreground text-xl font-semibold mb-2">
                 Ready to automate your workflows?
               </h3>

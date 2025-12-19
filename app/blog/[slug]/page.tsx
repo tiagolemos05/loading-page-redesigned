@@ -101,19 +101,14 @@ function generateArticleJsonLd(post: {
 function ContentGrid() {
   return (
     <div className="absolute inset-0 pointer-events-none hidden md:block overflow-visible" style={{ left: '-80px', right: '-80px' }}>
-      {/* Vertical grid lines */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--foreground) / 0.06) 1px, transparent 1px)
-          `,
-          backgroundSize: '33.333% 100%',
-          backgroundPosition: 'left',
-        }}
-      />
-      {/* Right edge vertical line */}
+      {/* Outer vertical lines (left and right edges) */}
+      <div className="absolute top-0 bottom-0 left-0 w-px bg-foreground/[0.06]" />
       <div className="absolute top-0 bottom-0 right-0 w-px bg-foreground/[0.06]" />
+      
+      {/* Middle vertical lines (hidden) */}
+      <div className="absolute top-0 bottom-0 w-px bg-foreground/[0]" style={{ left: '33.333%' }} />
+      <div className="absolute top-0 bottom-0 w-px bg-foreground/[0]" style={{ left: '66.666%' }} />
+      
       {/* Top horizontal line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-foreground/[0.06]" />
       {/* Bottom horizontal line */}
