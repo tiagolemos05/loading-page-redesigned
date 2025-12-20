@@ -593,11 +593,17 @@ function LiveContent({
                       const maxViews = analytics?.topArticles[0]?.views || 1
                       const percentage = (article.views / maxViews) * 100
                       const ctr = article.views > 0 ? ((article.clicks / article.views) * 100).toFixed(1) : '0.0'
-                      const authorBgColor = article.author === 'Tiago' 
+                      const authorLower = (article.author || '').toLowerCase().trim()
+                      const authorBgColor = authorLower === 'tiago' 
                         ? 'var(--author-tiago-bg-light)' 
-                        : article.author === 'Vicente' 
+                        : authorLower === 'vicente' 
                           ? 'var(--author-vicente-bg-light)' 
                           : 'var(--chart-grid)'
+                      const authorDotColor = authorLower === 'tiago' 
+                        ? 'var(--author-tiago)' 
+                        : authorLower === 'vicente' 
+                          ? 'var(--author-vicente)' 
+                          : 'var(--chart-primary)'
                       return (
                         <div key={article.slug} className="relative">
                           <div 
@@ -608,13 +614,7 @@ function LiveContent({
                             <div className="flex items-center gap-2 truncate max-w-[55%]">
                               <span 
                                 className="w-2 h-2 rounded-full flex-shrink-0" 
-                                style={{ 
-                                  background: article.author === 'Tiago' 
-                                    ? 'var(--author-tiago)' 
-                                    : article.author === 'Vicente' 
-                                      ? 'var(--author-vicente)' 
-                                      : 'var(--chart-primary)' 
-                                }}
+                                style={{ background: authorDotColor }}
                               />
                               <span className="text-foreground text-sm truncate">
                                 {article.title}
@@ -676,6 +676,18 @@ function PostItem({
   onShare?: (post: Post) => void
   showDivider: boolean
 }) {
+  const authorLower = (post.author || '').toLowerCase().trim()
+  const authorBg = authorLower === 'tiago'
+    ? 'var(--author-tiago-bg)'
+    : authorLower === 'vicente'
+      ? 'var(--author-vicente-bg)'
+      : 'var(--chart-grid)'
+  const authorColor = authorLower === 'tiago'
+    ? 'var(--author-tiago)'
+    : authorLower === 'vicente'
+      ? 'var(--author-vicente)'
+      : 'var(--chart-primary)'
+
   return (
     <article>
       <div className="py-8">
@@ -692,16 +704,8 @@ function PostItem({
           <span
             className="px-2 py-0.5 text-xs rounded"
             style={{
-              background: post.author === 'Tiago'
-                ? 'var(--author-tiago-bg)'
-                : post.author === 'Vicente'
-                  ? 'var(--author-vicente-bg)'
-                  : 'var(--chart-grid)',
-              color: post.author === 'Tiago'
-                ? 'var(--author-tiago)'
-                : post.author === 'Vicente'
-                  ? 'var(--author-vicente)'
-                  : 'var(--chart-primary)'
+              background: authorBg,
+              color: authorColor
             }}
           >
             {post.author || 'Node Wave'}
