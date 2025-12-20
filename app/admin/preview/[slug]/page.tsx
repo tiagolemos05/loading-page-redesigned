@@ -8,6 +8,7 @@ import { remark } from 'remark'
 import html from 'remark-html'
 import gfm from 'remark-gfm'
 import { TrackedContent } from '@/components/tracked-content'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 function ContentGrid() {
   return (
@@ -126,7 +127,10 @@ export default function AdminPreview() {
             <span className="text-foreground/20">/</span>
             <span className="text-muted-foreground">Blog</span>
           </div>
-          <span className="text-muted-foreground text-sm">Get in touch</span>
+          <div className="flex items-center gap-6">
+            <ThemeToggle />
+            <span className="text-muted-foreground text-sm">Get in touch</span>
+          </div>
         </div>
       </header>
       
@@ -192,11 +196,8 @@ export default function AdminPreview() {
             />
           </article>
 
-          <div className="mt-16 relative z-10">
-            <div 
-              className="border border-foreground/[0.06] rounded-xl p-8"
-              style={{ backgroundColor: '#111413' }}
-            >
+                    <div className="mt-16 relative z-10">
+            <div className="border border-foreground/[0.06] rounded-xl p-8 bg-foreground/[0.02]">
               <h3 className="text-foreground text-xl font-semibold mb-2">
                 Ready to automate your workflows?
               </h3>

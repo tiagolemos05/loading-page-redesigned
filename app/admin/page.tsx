@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('')
@@ -41,12 +42,15 @@ export default function AdminLogin() {
             <span className="text-foreground/20">/</span>
             <span className="text-muted-foreground">Admin</span>
           </div>
-          <Link 
-            href="/#contact-section" 
-            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-          >
-            Get in touch
-          </Link>
+          <div className="flex items-center gap-6">
+            <ThemeToggle />
+            <Link 
+              href="/#contact-section" 
+              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+            >
+              Get in touch
+            </Link>
+          </div>
         </div>
       </header>
 

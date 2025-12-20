@@ -38,7 +38,76 @@
 
     --ring: 165 96% 71%;
 
+    /* Author Colors */
+    --author-tiago: #1e40af;
+    --author-tiago-bg: rgba(30, 64, 175, 0.2);
+    --author-tiago-bg-light: rgba(30, 64, 175, 0.15);
+    --author-vicente: #ef4444;
+    --author-vicente-bg: rgba(239, 68, 68, 0.2);
+    --author-vicente-bg-light: rgba(239, 68, 68, 0.15);
+
+    /* Chart Colors */
+    --chart-primary: #78fcd6;
+    --chart-primary-rgb: 120, 252, 214;
+    --chart-secondary: #90a4ae;
+    --chart-secondary-rgb: 144, 164, 174;
+    --chart-text: hsl(160 14% 93% / 0.5);
+    --chart-grid: hsl(160 14% 93% / 0.08);
+    --chart-axis: hsl(160 14% 93% / 0.1);
+
     --radius: 0.5rem;
+  }
+
+  /* Light mode for blog */
+  .light {
+    --background: 160 14% 93%; /* #e7eceb */
+    --foreground: 210 11% 7%; /* #0f1211 */
+
+    --muted: 160 10% 88%; /* slightly darker than background */
+    --muted-foreground: 210 11% 7% / 0.6;
+    --muted-foreground-light: 210 11% 7% / 0.4;
+    --muted-foreground-dark: 210 11% 7% / 0.5;
+
+    --card: 210 11% 7% / 0.02;
+    --card-foreground: 210 11% 7%;
+
+    --popover: 160 14% 93%;
+    --popover-foreground: 210 11% 7%;
+
+    /* Primary Accent - Apple Blue */
+    --primary: 211 99% 52%; /* #0A80FE */
+    --primary-foreground: 0 0% 100%; /* white */
+    --primary-dark: 211 99% 45%;
+    --primary-light: 211 99% 90%;
+
+    --secondary: 210 11% 7%;
+    --secondary-foreground: 160 14% 93%;
+
+    --accent: 160 10% 85%;
+    --accent-foreground: 210 11% 7%;
+
+    --border: 210 11% 7% / 0.1;
+    --border-light: 210 11% 7% / 0.08;
+    --border-dark: 210 11% 7% / 0.05;
+
+    --ring: 211 99% 52%;
+
+    /* Author Colors - adjusted for light mode */
+    --author-tiago: #7c3aed; /* purple to differentiate from primary blue */
+    --author-tiago-bg: rgba(124, 58, 237, 0.2);
+    --author-tiago-bg-light: rgba(124, 58, 237, 0.15);
+    --author-vicente: #f87171; /* lighter red */
+    --author-vicente-bg: rgba(248, 113, 113, 0.2);
+    --author-vicente-bg-light: rgba(248, 113, 113, 0.15);
+
+    /* Chart Colors - Apple Blue for light mode */
+    --chart-primary: #0A80FE;
+    --chart-primary-rgb: 10, 128, 254;
+    --chart-secondary: #90a4ae;
+    --chart-secondary-rgb: 144, 164, 174;
+    --chart-text: hsl(210 11% 7% / 0.6);
+    --chart-grid: hsl(210 11% 7% / 0.1);
+    --chart-axis: hsl(210 11% 7% / 0.15);
   }
 }
 
@@ -176,6 +245,10 @@
 
 /* Hide grid lines behind code blocks */
 .prose pre {
-  background-color: hsl(210 11% 7%) !important;
+  background-color: hsl(var(--background)) !important;
   position: relative;
+}
+
+.light .prose pre {
+  background-color: hsl(210 11% 7%) !important;
 }

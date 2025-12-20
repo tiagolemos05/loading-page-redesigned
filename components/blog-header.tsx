@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { ArrowLeft, Link as LinkIcon } from "lucide-react"
 import { useState } from "react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export function BlogHeader() {
   return (
@@ -17,12 +18,15 @@ export function BlogHeader() {
             Blog
           </Link>
         </div>
-        <Link 
-          href="/#contact-section" 
-          className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-        >
-          Get in touch
-        </Link>
+        <div className="flex items-center gap-6">
+          <ThemeToggle />
+          <Link 
+            href="/#contact-section" 
+            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+          >
+            Get in touch
+          </Link>
+        </div>
       </div>
     </header>
   )

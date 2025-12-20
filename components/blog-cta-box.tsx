@@ -8,10 +8,7 @@ interface BlogCTABoxProps {
 
 export function BlogCTABox({ slug }: BlogCTABoxProps) {
   return (
-    <div 
-      className="border border-foreground/[0.06] rounded-xl p-8"
-      style={{ backgroundColor: '#111413' }}
-    >
+    <div className="border border-foreground/[0.06] rounded-xl p-8 bg-foreground/[0.02]">
       <h3 className="text-foreground text-xl font-semibold mb-2">
         Ready to automate your workflows?
       </h3>

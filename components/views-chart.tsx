@@ -71,50 +71,50 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
-          <defs>
+                    <defs>
             <linearGradient id="fillViews" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--chart-primary)" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="var(--chart-primary)" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="fillTiago" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#1e40af" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#1e40af" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--author-tiago)" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="var(--author-tiago)" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="fillVicente" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#991b1b" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#991b1b" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--author-vicente)" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="var(--author-vicente)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <XAxis 
+                    <XAxis 
           dataKey="date" 
           tickFormatter={(value, index) => index === 0 ? '' : formatDateShort(value)}
-          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-          axisLine={{ stroke: 'hsl(var(--foreground) / 0.1)' }}
+          tick={{ fill: 'var(--chart-text)', fontSize: 12 }}
+          axisLine={{ stroke: 'var(--chart-axis)' }}
           tickLine={false}
           />
           <YAxis 
-            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-            axisLine={{ stroke: 'hsl(var(--foreground) / 0.1)' }}
+            tick={{ fill: 'var(--chart-text)', fontSize: 12 }}
+            axisLine={{ stroke: 'var(--chart-axis)' }}
             tickLine={false}
           />
-          <Area
+                    <Area
             type="monotone"
             dataKey="views"
-            stroke="hsl(var(--primary))"
+            stroke="var(--chart-primary)"
             fill="url(#fillViews)"
             strokeWidth={2}
           />
           <Area
             type="monotone"
             dataKey="tiago"
-            stroke="#1e40af"
+            stroke="var(--author-tiago)"
             fill="url(#fillTiago)"
             strokeWidth={2}
           />
           <Area
             type="monotone"
             dataKey="vicente"
-            stroke="#991b1b"
+            stroke="var(--author-vicente)"
             fill="url(#fillVicente)"
             strokeWidth={2}
           />
@@ -152,16 +152,16 @@ export function ViewsChart({ data, formatDateShort }: ViewsChartProps) {
               {formatDateShort(tooltipData.date)}
             </p>
             <div className="space-y-1">
-              <p className="text-sm font-medium flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full" style={{ background: 'hsl(var(--primary))' }}></span>
+                            <p className="text-sm font-medium flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full" style={{ background: 'var(--chart-primary)' }}></span>
                 <span className="text-foreground">{tooltipData.views.toLocaleString()} total</span>
               </p>
               <p className="text-sm flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full" style={{ background: '#1e40af' }}></span>
+                <span className="w-2 h-2 rounded-full" style={{ background: 'var(--author-tiago)' }}></span>
                 <span className="text-foreground/80">{tooltipData.tiago.toLocaleString()} Tiago</span>
               </p>
               <p className="text-sm flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full" style={{ background: '#991b1b' }}></span>
+                <span className="w-2 h-2 rounded-full" style={{ background: 'var(--author-vicente)' }}></span>
                 <span className="text-foreground/80">{tooltipData.vicente.toLocaleString()} Vicente</span>
               </p>
             </div>

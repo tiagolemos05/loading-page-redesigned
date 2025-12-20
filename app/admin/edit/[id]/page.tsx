@@ -5,6 +5,7 @@ import { supabase, Post } from '@/lib/supabase'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export default function EditPost() {
   const [post, setPost] = useState<Post | null>(null)
@@ -89,13 +90,16 @@ export default function EditPost() {
             <span className="text-foreground/20">/</span>
             <span className="text-muted-foreground">Edit</span>
           </div>
-          <Link 
-            href={`/blog/${post.slug}`}
-            target="_blank"
-            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-          >
-            Preview post
-          </Link>
+          <div className="flex items-center gap-6">
+            <ThemeToggle />
+            <Link 
+              href={`/blog/${post.slug}`}
+              target="_blank"
+              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+            >
+              Preview post
+            </Link>
+          </div>
         </div>
       </header>
 

@@ -28,9 +28,9 @@ import {
 } from 'recharts'
 import type { ChartConfig } from '@/lib/chart-schemas'
 
-// Brand colors
-const BRAND_GREEN = '#78fcd6'
-const BRAND_GREY = '#90a4ae'
+// Brand colors - use CSS variables for theme support
+const BRAND_GREEN = 'var(--chart-primary)'
+const BRAND_GREY = 'var(--chart-secondary)'
 
 interface BlogChartProps {
   config: ChartConfig
@@ -52,20 +52,20 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-// Axis styling
+// Axis styling - use CSS variables
 const axisStyle = {
   fontSize: 12,
-  fill: 'hsl(160 14% 93% / 0.5)',
+  fill: 'var(--chart-text)',
 }
 
-// Generate green shades by darkening the color (not just opacity)
+// Generate primary color shades by using HSL manipulation via CSS
+// For dark mode: teal shades, for light mode: blue shades
 const getGreenShade = (index: number, total: number) => {
-  // HSL values for brand green #78fcd6: H=163, S=95%, L=73%
-  // Start at 55% (darker than original) down to 20%
-  const maxLightness = 55
-  const minLightness = 20
-  const lightness = maxLightness - (index / Math.max(total - 1, 1)) * (maxLightness - minLightness)
-  return `hsl(163, 95%, ${lightness}%)`
+  // We'll use opacity-based shading that works with the CSS variable
+  const maxOpacity = 1
+  const minOpacity = 0.3
+  const opacity = maxOpacity - (index / Math.max(total - 1, 1)) * (maxOpacity - minOpacity)
+  return `rgba(var(--chart-primary-rgb), ${opacity})`
 }
 
 // Hidden SVG with gradient definitions
@@ -76,71 +76,71 @@ const GradientDefs = ({ id, cellCount = 6 }: { id: string, cellCount?: number })
   return (
     <svg width="0" height="0" style={{ position: 'absolute' }}>
       <defs>
-        {/* Green edge glow - left side */}
+                {/* Green edge glow - left side */}
         <linearGradient id={`${id}-edge-left-green`} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={BRAND_GREEN} stopOpacity={0.5} />
-          <stop offset="100%" stopColor={BRAND_GREEN} stopOpacity={0} />
+          <stop offset="0%" stopColor="var(--chart-primary)" stopOpacity={0.5} />
+          <stop offset="100%" stopColor="var(--chart-primary)" stopOpacity={0} />
         </linearGradient>
         
         {/* Green edge glow - right side */}
         <linearGradient id={`${id}-edge-right-green`} x1="100%" y1="0%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor={BRAND_GREEN} stopOpacity={0.5} />
-          <stop offset="100%" stopColor={BRAND_GREEN} stopOpacity={0} />
+          <stop offset="0%" stopColor="var(--chart-primary)" stopOpacity={0.5} />
+          <stop offset="100%" stopColor="var(--chart-primary)" stopOpacity={0} />
         </linearGradient>
         
         {/* Green edge glow - bottom */}
         <linearGradient id={`${id}-edge-bottom-green`} x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor={BRAND_GREEN} stopOpacity={0.5} />
-          <stop offset="100%" stopColor={BRAND_GREEN} stopOpacity={0} />
+          <stop offset="0%" stopColor="var(--chart-primary)" stopOpacity={0.5} />
+          <stop offset="100%" stopColor="var(--chart-primary)" stopOpacity={0} />
         </linearGradient>
         
         {/* Grey edge glow - left side */}
         <linearGradient id={`${id}-edge-left-grey`} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={BRAND_GREY} stopOpacity={0.5} />
-          <stop offset="100%" stopColor={BRAND_GREY} stopOpacity={0} />
+          <stop offset="0%" stopColor="var(--chart-secondary)" stopOpacity={0.5} />
+          <stop offset="100%" stopColor="var(--chart-secondary)" stopOpacity={0} />
         </linearGradient>
         
         {/* Grey edge glow - right side */}
         <linearGradient id={`${id}-edge-right-grey`} x1="100%" y1="0%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor={BRAND_GREY} stopOpacity={0.5} />
-          <stop offset="100%" stopColor={BRAND_GREY} stopOpacity={0} />
+          <stop offset="0%" stopColor="var(--chart-secondary)" stopOpacity={0.5} />
+          <stop offset="100%" stopColor="var(--chart-secondary)" stopOpacity={0} />
         </linearGradient>
         
         {/* Grey edge glow - bottom */}
         <linearGradient id={`${id}-edge-bottom-grey`} x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor={BRAND_GREY} stopOpacity={0.5} />
-          <stop offset="100%" stopColor={BRAND_GREY} stopOpacity={0} />
+          <stop offset="0%" stopColor="var(--chart-secondary)" stopOpacity={0.5} />
+          <stop offset="100%" stopColor="var(--chart-secondary)" stopOpacity={0} />
         </linearGradient>
         
         {/* Area/Line fill gradient */}
         <linearGradient id={`${id}-area`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={BRAND_GREEN} stopOpacity={0.4} />
-          <stop offset="50%" stopColor={BRAND_GREEN} stopOpacity={0.15} />
-          <stop offset="100%" stopColor={BRAND_GREEN} stopOpacity={0.05} />
+          <stop offset="0%" stopColor="var(--chart-primary)" stopOpacity={0.4} />
+          <stop offset="50%" stopColor="var(--chart-primary)" stopOpacity={0.15} />
+          <stop offset="100%" stopColor="var(--chart-primary)" stopOpacity={0.05} />
         </linearGradient>
         
-        {/* Treemap cell colors - HSL darkening */}
+                {/* Treemap cell colors - opacity based */}
         {Array.from({ length: actualCellCount }).map((_, i) => {
-          const maxLightness = 55
-          const minLightness = 20
-          const lightness = maxLightness - (i / Math.max(actualCellCount - 1, 1)) * (maxLightness - minLightness)
+          const maxOpacity = 1
+          const minOpacity = 0.3
+          const opacity = maxOpacity - (i / Math.max(actualCellCount - 1, 1)) * (maxOpacity - minOpacity)
           return (
             <linearGradient key={`cell-${i}`} id={`${id}-cell-${i}`} x1="0%" y1="0%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor={`hsl(163, 95%, ${lightness}%)`} />
-              <stop offset="100%" stopColor={`hsl(163, 95%, ${lightness}%)`} />
+              <stop offset="0%" stopColor={`rgba(var(--chart-primary-rgb), ${opacity})`} />
+              <stop offset="100%" stopColor={`rgba(var(--chart-primary-rgb), ${opacity})`} />
             </linearGradient>
           )
         })}
         
-        {/* Funnel section colors - HSL darkening */}
+        {/* Funnel section colors - opacity based */}
         {Array.from({ length: actualCellCount }).map((_, i) => {
-          const maxLightness = 55
-          const minLightness = 20
-          const lightness = maxLightness - (i / Math.max(actualCellCount - 1, 1)) * (maxLightness - minLightness)
+          const maxOpacity = 1
+          const minOpacity = 0.3
+          const opacity = maxOpacity - (i / Math.max(actualCellCount - 1, 1)) * (maxOpacity - minOpacity)
           return (
             <linearGradient key={`funnel-${i}`} id={`${id}-funnel-${i}`} x1="0%" y1="0%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor={`hsl(163, 95%, ${lightness}%)`} />
-              <stop offset="100%" stopColor={`hsl(163, 95%, ${lightness}%)`} />
+              <stop offset="0%" stopColor={`rgba(var(--chart-primary-rgb), ${opacity})`} />
+              <stop offset="100%" stopColor={`rgba(var(--chart-primary-rgb), ${opacity})`} />
             </linearGradient>
           )
         })}
@@ -156,7 +156,8 @@ const createEdgeBar = (gradientId: string, colorKey: 'green' | 'grey') => (props
   
   const radius = 6
   const safeRadius = Math.min(radius, width / 2, height)
-  const color = colorKey === 'green' ? BRAND_GREEN : BRAND_GREY
+  const color = colorKey === 'green' ? 'var(--chart-primary)' : 'var(--chart-secondary)'
+  const colorRgb = colorKey === 'green' ? 'var(--chart-primary-rgb)' : 'var(--chart-secondary-rgb)'
   const edgeWidth = width * 0.15
   
   // Full bar path with rounded top
@@ -225,11 +226,12 @@ const createEdgeBar = (gradientId: string, colorKey: 'green' | 'grey') => (props
         fill={`url(#${gradientId}-edge-right-${colorKey})`}
       />
       
-      {/* Border line */}
+            {/* Border line */}
       <path 
         d={borderPath}
         fill="none"
-        stroke={`rgba(${colorKey === 'green' ? '120,252,214' : '144,164,174'},0.4)`}
+        stroke={color}
+        strokeOpacity={0.4}
         strokeWidth={1.5}
       />
     </g>
@@ -247,7 +249,7 @@ const renderPieLabel = ({ cx, cy, midAngle, outerRadius, name, percent }: any) =
     <text
       x={x}
       y={y}
-      fill="hsl(160 14% 93%)"
+      fill="var(--chart-text)"
       textAnchor={x > cx ? 'start' : 'end'}
       dominantBaseline="central"
       fontSize={11}
@@ -379,7 +381,7 @@ const EquilateralTriangleFunnel = ({ data, gradientId, nameKey }: any) => {
         strokeWidth={1.5}
       />
       
-      {sections.map((section: any, i: number) => {
+            {sections.map((section: any, i: number) => {
         const labelY = section.y + section.height / 2
         const labelX = rightX + 20
         return (
@@ -387,7 +389,7 @@ const EquilateralTriangleFunnel = ({ data, gradientId, nameKey }: any) => {
             key={`label-${i}`}
             x={labelX}
             y={labelY}
-            fill="hsl(160 14% 93%)"
+            fill="var(--chart-text)"
             fontSize={12}
             dominantBaseline="middle"
           >
@@ -424,7 +426,7 @@ export function BlogChart({ config }: BlogChartProps) {
       case 'line':
         return (
           <LineChart data={config.data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 14% 93% / 0.08)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey={config.xKey} tick={axisStyle} axisLine={false} tickLine={false} />
             <YAxis tick={axisStyle} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
@@ -457,7 +459,7 @@ export function BlogChart({ config }: BlogChartProps) {
       case 'area':
         return (
           <AreaChart data={config.data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 14% 93% / 0.08)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey={config.xKey} tick={axisStyle} axisLine={false} tickLine={false} />
             <YAxis tick={axisStyle} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
@@ -489,10 +491,10 @@ export function BlogChart({ config }: BlogChartProps) {
         const hasMultipleBars = config.yKeys && config.yKeys.length > 1
         return (
           <BarChart data={config.data} barSize={45}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 14% 93% / 0.08)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey={config.xKey} tick={axisStyle} axisLine={false} tickLine={false} />
             <YAxis tick={axisStyle} axisLine={false} tickLine={false} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(160 14% 93% / 0.03)' }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--chart-grid)' }} />
             {config.yKeys ? (
               config.yKeys.map((key, i) => (
                 <Bar 
@@ -546,7 +548,7 @@ export function BlogChart({ config }: BlogChartProps) {
         
         return (
           <RadarChart data={config.data} cx="50%" cy="50%" outerRadius="70%">
-            <PolarGrid stroke="hsl(160 14% 93% / 0.15)" />
+            <PolarGrid stroke="var(--chart-grid)" />
             <PolarAngleAxis dataKey={config.angleKey} tick={axisStyle} />
             <PolarRadiusAxis tick={axisStyle} axisLine={false} />
             {radarDataKeys.map((key, i) => (
@@ -568,7 +570,7 @@ export function BlogChart({ config }: BlogChartProps) {
       case 'scatter':
         return (
           <ScatterChart>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 14% 93% / 0.08)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
             <XAxis dataKey={config.xKey} tick={axisStyle} axisLine={false} tickLine={false} name={config.xKey} />
             <YAxis dataKey={config.yKey} tick={axisStyle} axisLine={false} tickLine={false} name={config.yKey} />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />

@@ -1,17 +1,17 @@
 import { HeroSection } from "@/components/hero-section"
 import { SocialProof } from "@/components/social-proof"
 import { BentoSection } from "@/components/bento-section"
-
-
 import { TestimonialGridSection } from "@/components/testimonial-grid-section"
 import { FAQSection } from "@/components/faq-section"
 import { ContactSection } from "@/components/contact-section"
 import { FooterSection } from "@/components/footer-section"
 import { AnimatedSection } from "@/components/animated-section"
+import { ForceDarkMode } from "@/components/force-dark-mode"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden pb-0">
+      <ForceDarkMode />
       <div className="relative z-10">
         <main className="max-w-[1320px] mx-auto relative">
           <HeroSection />

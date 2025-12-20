@@ -10,6 +10,7 @@ import { ArticlesModal } from '@/components/articles-modal'
 import { ShareModal } from '@/components/share-modal'
 import { ViewsChart } from '@/components/views-chart'
 import { AddPostPanel } from '@/components/add-post-panel'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 type ModalAction = {
   type: 'publish' | 'unpublish' | 'delete'
@@ -228,6 +229,7 @@ export default function AdminDashboard() {
             <span className="text-muted-foreground">Admin</span>
           </div>
           <div className="flex items-center gap-6">
+            <ThemeToggle />
             <button
               onClick={toggleExcludeAnalytics}
               className={`text-sm transition-colors flex items-center gap-1.5 ${
@@ -504,15 +506,15 @@ function LiveContent({
                 <h3 className="text-foreground font-medium">Views Over Time</h3>
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full" style={{ background: 'hsl(var(--primary))' }} />
+                    <span className="w-2 h-2 rounded-full" style={{ background: 'var(--chart-primary)' }} />
                     <span className="text-muted-foreground">Total</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full" style={{ background: '#1e40af' }} />
+                    <span className="w-2 h-2 rounded-full" style={{ background: 'var(--author-tiago)' }} />
                     <span className="text-muted-foreground">Tiago</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full" style={{ background: '#991b1b' }} />
+                    <span className="w-2 h-2 rounded-full" style={{ background: 'var(--author-vicente)' }} />
                     <span className="text-muted-foreground">Vicente</span>
                   </div>
                 </div>
@@ -591,16 +593,16 @@ function LiveContent({
                       const maxViews = analytics?.topArticles[0]?.views || 1
                       const percentage = (article.views / maxViews) * 100
                       const ctr = article.views > 0 ? ((article.clicks / article.views) * 100).toFixed(1) : '0.0'
-                      const authorColor = article.author === 'Tiago' 
-                        ? 'rgba(30, 64, 175, 0.15)' 
+                      const authorBgColor = article.author === 'Tiago' 
+                        ? 'var(--author-tiago-bg-light)' 
                         : article.author === 'Vicente' 
-                          ? 'rgba(153, 27, 27, 0.15)' 
-                          : 'hsl(var(--primary) / 0.1)'
+                          ? 'var(--author-vicente-bg-light)' 
+                          : 'var(--chart-grid)'
                       return (
                         <div key={article.slug} className="relative">
                           <div 
                             className="absolute inset-0 rounded"
-                            style={{ width: `${percentage}%`, background: authorColor }}
+                            style={{ width: `${percentage}%`, background: authorBgColor }}
                           />
                           <div className="relative flex items-center justify-between py-1.5 px-2">
                             <div className="flex items-center gap-2 truncate max-w-[55%]">
@@ -608,10 +610,10 @@ function LiveContent({
                                 className="w-2 h-2 rounded-full flex-shrink-0" 
                                 style={{ 
                                   background: article.author === 'Tiago' 
-                                    ? '#1e40af' 
+                                    ? 'var(--author-tiago)' 
                                     : article.author === 'Vicente' 
-                                      ? '#991b1b' 
-                                      : 'hsl(var(--primary))' 
+                                      ? 'var(--author-vicente)' 
+                                      : 'var(--chart-primary)' 
                                 }}
                               />
                               <span className="text-foreground text-sm truncate">
@@ -691,15 +693,15 @@ function PostItem({
             className="px-2 py-0.5 text-xs rounded"
             style={{
               background: post.author === 'Tiago'
-                ? 'rgba(30, 64, 175, 0.2)'
+                ? 'var(--author-tiago-bg)'
                 : post.author === 'Vicente'
-                  ? 'rgba(153, 27, 27, 0.2)'
-                  : 'hsl(var(--primary) / 0.2)',
+                  ? 'var(--author-vicente-bg)'
+                  : 'var(--chart-grid)',
               color: post.author === 'Tiago'
-                ? '#3b82f6'
+                ? 'var(--author-tiago)'
                 : post.author === 'Vicente'
-                  ? '#ef4444'
-                  : 'hsl(var(--primary))'
+                  ? 'var(--author-vicente)'
+                  : 'var(--chart-primary)'
             }}
           >
             {post.author || 'Node Wave'}
