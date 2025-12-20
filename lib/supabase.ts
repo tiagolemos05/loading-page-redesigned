@@ -51,4 +51,5 @@ export type Post = {
   published_at: string | null
   meta_title: string | null
   focus_keyword: string | null
+  charts: unknown[] | null
 }

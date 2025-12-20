@@ -1,7 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { getVisitorIdClient, isExcluded } from './page-tracker'
+import { BlogChart } from './blog-chart'
+import type { ChartConfig } from '@/lib/chart-schemas'
 
 const TRACKED_URLS = [
   'nodewave.io/#contact-section',
@@ -13,11 +15,55 @@ const TRACKED_URLS = [
 interface TrackedContentProps {
   slug: string
   html: string
+  charts?: unknown[] | null
   className?: string
 }
 
-export function TrackedContent({ slug, html, className }: TrackedContentProps) {
+interface ContentSegment {
+  type: 'html' | 'chart'
+  content: string | number // HTML string or chart index
+}
+
+function parseContentWithCharts(html: string): ContentSegment[] {
+  const segments: ContentSegment[] = []
+  const markerRegex = /\{\{chart:(\d+)\}\}/g
+  let lastIndex = 0
+  let match
+
+  while ((match = markerRegex.exec(html)) !== null) {
+    // Add HTML before this marker
+    if (match.index > lastIndex) {
+      segments.push({
+        type: 'html',
+        content: html.slice(lastIndex, match.index)
+      })
+    }
+    
+    // Add chart marker
+    segments.push({
+      type: 'chart',
+      content: parseInt(match[1], 10)
+    })
+    
+    lastIndex = match.index + match[0].length
+  }
+
+  // Add remaining HTML after last marker
+  if (lastIndex < html.length) {
+    segments.push({
+      type: 'html',
+      content: html.slice(lastIndex)
+    })
+  }
+
+  return segments
+}
+
+export function TrackedContent({ slug, html, charts, className }: TrackedContentProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  
+  const segments = useMemo(() => parseContentWithCharts(html), [html])
+  const chartConfigs = useMemo(() => (charts || []) as ChartConfig[], [charts])
 
   useEffect(() => {
     const container = containerRef.current
@@ -61,11 +107,46 @@ export function TrackedContent({ slug, html, className }: TrackedContentProps) {
     return () => container.removeEventListener('click', handleClick)
   }, [slug])
 
+  // If no charts or no markers, render simple HTML
+  if (!chartConfigs.length || segments.length === 1) {
+    return (
+      <div 
+        ref={containerRef}
+        className={className}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    )
+  }
+
   return (
-    <div 
-      ref={containerRef}
-      className={className}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div ref={containerRef} className={className}>
+      {segments.map((segment, index) => {
+        if (segment.type === 'html') {
+          return (
+            <div
+              key={`html-${index}`}
+              dangerouslySetInnerHTML={{ __html: segment.content as string }}
+            />
+          )
+        }
+        
+        // Chart segment
+        const chartIndex = segment.content as number
+        const chartConfig = chartConfigs[chartIndex]
+        
+        if (!chartConfig) {
+          return (
+            <div 
+              key={`chart-${index}`}
+              className="my-8 p-4 border border-red-500/20 bg-red-500/5 rounded-lg text-red-400 text-sm"
+            >
+              Chart {chartIndex} not found
+            </div>
+          )
+        }
+        
+        return <BlogChart key={`chart-${index}`} config={chartConfig} />
+      })}
+    </div>
   )
 }

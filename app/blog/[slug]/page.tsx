@@ -207,6 +207,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             <TrackedContent 
               slug={slug}
               html={post.contentHtml}
+              charts={post.charts}
               className="prose prose-invert prose-lg max-w-none
                 prose-headings:text-foreground prose-headings:font-semibold
                 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4

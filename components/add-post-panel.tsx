@@ -2,6 +2,12 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { 
+  validateCharts, 
+  validateChartMarkers, 
+  generateChartErrorPrompt,
+  generateChartDocumentation 
+} from '@/lib/chart-schemas'
 
 interface AddPostPanelProps {
   isOpen: boolean
@@ -11,13 +17,26 @@ interface AddPostPanelProps {
 
 const EXAMPLE_JSON = `{
   "title": "Your Post Title",
-  "content": "Full markdown content of the post (aim for ~800 words for 4 min read)...",
+  "content": "Full markdown content...\\n\\n{{chart:0}}\\n\\nMore content after chart...",
   "description": "Short description for previews and SEO",
   "author": "Tiago",
   "tags": ["automation", "n8n", "tutorial"],
   "slug": "custom-url-slug",
   "meta_title": "SEO Title (if different from title)",
-  "focus_keyword": "main seo keyword"
+  "focus_keyword": "main seo keyword",
+  "charts": [
+    {
+      "type": "bar",
+      "title": "Example Chart",
+      "data": [
+        { "name": "Before", "value": 100 },
+        { "name": "After", "value": 20 }
+      ],
+      "xKey": "name",
+      "yKey": "value",
+      "color": "#78fcd6"
+    }
+  ]
 }`
 
 const FIELD_HINTS: Record<string, { explanation: string; seoImpact: string; hint: string }> = {
@@ -29,7 +48,7 @@ const FIELD_HINTS: Record<string, { explanation: string; seoImpact: string; hint
   content: {
     explanation: "The full markdown content of your post",
     seoImpact: "Search engines analyze content for relevance. Use headings (H2, H3), include keywords naturally, and aim for comprehensive coverage of the topic.",
-    hint: "Aim for ~800 words (4 min read) - long enough for value, short enough to keep readers engaged until the CTA. Use markdown formatting with H2/H3 headings."
+    hint: "Aim for ~800 words (4 min read). Use markdown formatting with H2/H3 headings. Place {{chart:N}} markers where charts should appear."
   },
   description: {
     explanation: "A brief summary of the post content",
@@ -60,6 +79,11 @@ const FIELD_HINTS: Record<string, { explanation: string; seoImpact: string; hint
     explanation: "The primary keyword/phrase you want this post to rank for",
     seoImpact: "Guides your content optimization. Should appear in title, meta_title, description, slug, and naturally throughout content.",
     hint: "2-4 words, research search volume, be specific (long-tail keywords often convert better)"
+  },
+  charts: {
+    explanation: "Array of interactive chart configurations to embed in the post",
+    seoImpact: "Charts render as interactive SVG, improving engagement. The data is visible to search engines.",
+    hint: "See chart documentation below. Reference charts in content using {{chart:0}}, {{chart:1}}, etc."
   }
 }
 
@@ -71,11 +95,14 @@ export function AddPostPanel({ isOpen, onClose, onPostCreated }: AddPostPanelPro
   const [analysisResult, setAnalysisResult] = useState<{
     valid: boolean
     missingFields: string[]
+    chartErrors: string | null
     prompt: string
   } | null>(null)
   const [isPosting, setIsPosting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState<'example' | 'prompt' | null>(null)
+
+  const chartDocumentation = generateChartDocumentation()
 
   const fullPrompt = `This is an example of the expected blog post input structure. All fields must have values - no empty fields are valid:
 
@@ -87,6 +114,8 @@ ${Object.entries(FIELD_HINTS).map(([field, info]) => `• ${field}:
   - What it is: ${info.explanation}
   - SEO impact: ${info.seoImpact}
   - Guidelines: ${info.hint}`).join('\n\n')}
+
+${chartDocumentation}
 
 In-content CTAs (automatically tracked when clicked):
 When appropriate, include inline calls-to-action within the content to drive engagement. These links are automatically tracked as CTA clicks:
@@ -110,7 +139,9 @@ Example: "Want us to analyze your current workflow? [Get in touch](https://www.n
       try {
         const parsed = JSON.parse(jsonInput)
         const missingFields: string[] = []
+        let chartErrorPrompt: string | null = null
 
+        // Check required fields
         for (const field of REQUIRED_FIELDS) {
           const value = parsed[field]
           if (value === undefined || value === null || value === '') {
@@ -120,25 +151,56 @@ Example: "Want us to analyze your current workflow? [Get in touch](https://www.n
           }
         }
 
-        if (missingFields.length > 0) {
-          const promptLines = ['The JSON output for this post is incomplete. The following fields are missing or empty:\n']
+        // Validate charts if present
+        if (parsed.charts && Array.isArray(parsed.charts) && parsed.charts.length > 0) {
+          const chartValidation = validateCharts(parsed.charts)
+          const markerErrors = validateChartMarkers(parsed.content || '', parsed.charts)
+
+          if (!chartValidation.valid || markerErrors.length > 0) {
+            chartErrorPrompt = generateChartErrorPrompt(chartValidation, markerErrors)
+          }
+        }
+
+        // Check for chart markers without charts array
+        const content = parsed.content || ''
+        const hasChartMarkers = /\{\{chart:\d+\}\}/.test(content)
+        if (hasChartMarkers && (!parsed.charts || parsed.charts.length === 0)) {
+          chartErrorPrompt = 'Content contains chart markers ({{chart:N}}) but no "charts" array is defined. Either add charts or remove the markers.'
+        }
+
+        const hasErrors = missingFields.length > 0 || chartErrorPrompt !== null
+
+        if (hasErrors) {
+          const promptLines: string[] = []
           
-          for (const field of missingFields) {
-            const hint = FIELD_HINTS[field]
-            promptLines.push(`• ${field}: ${hint.hint}`)
+          if (missingFields.length > 0) {
+            promptLines.push('The JSON output for this post is incomplete. The following fields are missing or empty:\n')
+            for (const field of missingFields) {
+              const hint = FIELD_HINTS[field]
+              if (hint) {
+                promptLines.push(`• ${field}: ${hint.hint}`)
+              }
+            }
+            promptLines.push('')
+          }
+
+          if (chartErrorPrompt) {
+            promptLines.push(chartErrorPrompt)
           }
           
-          promptLines.push('\nPlease provide values for these fields following the SEO guidelines.')
+          promptLines.push('\nPlease fix these issues following the documentation provided.')
 
           setAnalysisResult({
             valid: false,
             missingFields,
+            chartErrors: chartErrorPrompt,
             prompt: promptLines.join('\n')
           })
         } else {
           setAnalysisResult({
             valid: true,
             missingFields: [],
+            chartErrors: null,
             prompt: ''
           })
         }
@@ -292,13 +354,17 @@ Example: "Want us to analyze your current workflow? [Get in touch](https://www.n
             </div>
           )}
 
-          {/* Analysis Result - Missing Fields */}
+          {/* Analysis Result - Missing Fields or Chart Errors */}
           {analysisResult && !analysisResult.valid && (
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-foreground font-medium flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-yellow-500" />
-                  Missing Fields
+                  {analysisResult.missingFields.length > 0 && analysisResult.chartErrors 
+                    ? 'Missing Fields & Chart Errors'
+                    : analysisResult.missingFields.length > 0 
+                      ? 'Missing Fields' 
+                      : 'Chart Errors'}
                 </h3>
                 <button
                   onClick={() => copyToClipboard(analysisResult.prompt, 'prompt')}
