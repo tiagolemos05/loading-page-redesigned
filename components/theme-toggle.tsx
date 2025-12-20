@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 type Theme = 'light' | 'dark'
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>('dark')
+  const [theme, setTheme] = useState<Theme | null>(null)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -29,7 +29,16 @@ export function ThemeToggle() {
     document.documentElement.classList.toggle('light', newTheme === 'light')
   }
 
-  if (!mounted) return null
+  // Don't render anything until mounted to avoid hydration mismatch
+  if (!mounted || theme === null) {
+    return (
+      <div className="hidden md:flex items-center gap-3">
+        <span className="text-sm text-muted-foreground">Light Mode</span>
+        <div className="w-14 h-7 rounded-full bg-muted" />
+        <span className="text-sm text-muted-foreground">Dark Mode</span>
+      </div>
+    )
+  }
 
   const isDark = theme === 'dark'
 

@@ -243,12 +243,60 @@
   margin-left: -1.5rem;
 }
 
-/* Hide grid lines behind code blocks */
+/* Code blocks - adapt to theme */
 .prose pre {
-  background-color: hsl(var(--background)) !important;
+  background-color: #0f1211 !important;
+  border: 1px solid rgba(231, 236, 235, 0.06) !important;
+  border-radius: 0.5rem !important;
+  padding: 1rem !important;
   position: relative;
+  overflow-x: auto;
 }
 
-.light .prose pre {
-  background-color: hsl(210 11% 7%) !important;
+.prose pre code {
+  color: #e7eceb !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: 0.875rem !important;
+}
+
+/* Light mode code blocks - grey background with dark text */
+.light .prose pre,
+.light .prose-invert pre {
+  background-color: hsl(var(--foreground) / 0.05) !important;
+  border: 1px solid hsl(var(--foreground) / 0.1) !important;
+}
+
+.light .prose pre code,
+.light .prose-invert pre code {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Inline code styling - adapts to theme */
+.prose code:not(pre code) {
+  background-color: hsl(var(--foreground) / 0.05);
+  color: hsl(var(--primary));
+}
+
+.light .prose code:not(pre code),
+.light .prose-invert code:not(pre code) {
+  background-color: hsl(var(--foreground) / 0.08);
+  color: hsl(var(--primary));
+}
+
+/* Light mode prose overrides */
+.light .prose,
+.light .prose-invert {
+  --tw-prose-body: hsl(var(--muted-foreground));
+  --tw-prose-headings: hsl(var(--foreground));
+  --tw-prose-links: hsl(var(--primary));
+  --tw-prose-bold: hsl(var(--foreground));
+  --tw-prose-counters: hsl(var(--muted-foreground));
+  --tw-prose-bullets: hsl(var(--primary) / 0.5);
+  --tw-prose-quotes: hsl(var(--muted-foreground));
+  --tw-prose-quote-borders: hsl(var(--primary));
+  --tw-prose-code: hsl(var(--primary));
+  --tw-prose-pre-bg: #0f1211;
+  --tw-prose-pre-code: #e7eceb;
 }

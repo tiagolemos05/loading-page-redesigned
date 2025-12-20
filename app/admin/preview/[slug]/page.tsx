@@ -189,7 +189,6 @@ export default function AdminPreview() {
                 prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                 prose-strong:text-foreground prose-strong:font-semibold
                 prose-code:text-primary prose-code:bg-foreground/[0.05] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
-                prose-pre:bg-foreground/[0.03] prose-pre:border prose-pre:border-foreground/[0.06] prose-pre:rounded-lg
                 prose-ul:text-muted-foreground prose-ol:text-muted-foreground
                 prose-li:marker:text-primary/50
                 prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-blockquote:italic"
