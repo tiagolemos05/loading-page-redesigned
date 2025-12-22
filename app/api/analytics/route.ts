@@ -4,7 +4,6 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 export async function GET(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin()
   
-  // Check auth - require authenticated user
   const authHeader = request.headers.get('authorization')
   if (!authHeader) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -18,93 +17,94 @@ export async function GET(request: NextRequest) {
   const startDateStr = startDate.toISOString()
 
   try {
-    // Get all published post slugs first
-    const { data: publishedPosts } = await supabaseAdmin
+    // Get all published post slugs
+    const { data: publishedPosts, error: postsError } = await supabaseAdmin
       .from('posts')
       .select('slug, title, author')
       .eq('draft', false)
 
-    const publishedSlugs = new Set((publishedPosts || []).map(p => p.slug))
-
-    // Get all page views within the time range
-    const { data: pageViews, error: viewsError } = await supabaseAdmin
-      .from('page_views')
-      .select('*')
-      .gte('created_at', startDateStr)
-      .order('created_at', { ascending: true })
-
-    if (viewsError) {
-      console.error('Error fetching page views:', viewsError)
-      return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 })
+    if (postsError) {
+      console.error('Posts error:', postsError)
+      throw postsError
     }
 
-    // Filter views to only include published posts (not blog overview)
-    const views = (pageViews || []).filter(view => publishedSlugs.has(view.slug))
-    
-    // Get blog overview views separately
-    const blogViews = (pageViews || []).filter(view => view.slug === 'blog')
+    const publishedSlugs = (publishedPosts || []).map(p => p.slug)
+    console.log('Published slugs:', publishedSlugs.length)
 
-    // Get all CTA clicks within the time range
-    const { data: ctaClicks, error: ctaError } = await supabaseAdmin
-      .from('cta_clicks')
-      .select('*')
-      .gte('created_at', startDateStr)
-
-    if (ctaError) {
-      console.error('Error fetching CTA clicks:', ctaError)
-    }
-
-    // Filter CTA clicks to only include published posts
-    const clicks = (ctaClicks || []).filter(click => publishedSlugs.has(click.slug))
-
-    // Create a map of slug to author
     const slugToAuthor: Record<string, string> = {}
     ;(publishedPosts || []).forEach(post => {
       slugToAuthor[post.slug] = post.author || 'Node Wave'
     })
 
-    // 1. Daily views for line chart - split by author
-    const dailyViews: Record<string, { 
-      total: number
-      unique: Set<string>
-      tiago: number
-      vicente: number
-    }> = {}
-    
+    // Get counts via RPC
+    const { data: counts, error: countsError } = await supabaseAdmin
+      .rpc('get_analytics_counts', {
+        start_date: startDateStr,
+        slug_list: publishedSlugs
+      })
+
+    if (countsError) {
+      console.error('Counts RPC error:', countsError)
+      throw countsError
+    }
+    console.log('Counts:', counts)
+
+    // Get daily data via RPC
+    const { data: dailyRpcData, error: dailyError } = await supabaseAdmin
+      .rpc('get_daily_analytics', {
+        start_date: startDateStr,
+        slug_list: publishedSlugs
+      })
+
+    if (dailyError) {
+      console.error('Daily RPC error:', dailyError)
+      throw dailyError
+    }
+    console.log('Daily data rows:', dailyRpcData?.length)
+
     // Initialize all days in range
+    const dailyViews: Record<string, { views: number; visitors: number; tiago: number; vicente: number }> = {}
     for (let i = 0; i <= days; i++) {
       const date = new Date()
       date.setDate(date.getDate() - (days - i))
       const dateStr = date.toISOString().split('T')[0]
-      dailyViews[dateStr] = { total: 0, unique: new Set(), tiago: 0, vicente: 0 }
+      dailyViews[dateStr] = { views: 0, visitors: 0, tiago: 0, vicente: 0 }
     }
 
-    views.forEach(view => {
-      const dateStr = new Date(view.created_at).toISOString().split('T')[0]
-      if (dailyViews[dateStr] && view.slug !== 'blog') {
-        dailyViews[dateStr].total++
-        dailyViews[dateStr].unique.add(view.visitor_id)
-        
-        const author = slugToAuthor[view.slug] || 'Node Wave'
-        if (author === 'Tiago') {
-          dailyViews[dateStr].tiago++
-        } else if (author === 'Vicente') {
-          dailyViews[dateStr].vicente++
+    // Merge RPC data
+    if (dailyRpcData && Array.isArray(dailyRpcData)) {
+      dailyRpcData.forEach((day: any) => {
+        const dateStr = day.date
+        if (dailyViews[dateStr]) {
+          dailyViews[dateStr] = {
+            views: day.views || 0,
+            visitors: day.visitors || 0,
+            tiago: day.tiago || 0,
+            vicente: day.vicente || 0,
+          }
         }
-      }
-    })
+      })
+    }
 
     const dailyData = Object.entries(dailyViews).map(([date, data]) => ({
       date,
-      views: data.total,
-      visitors: data.unique.size,
-      tiago: data.tiago,
-      vicente: data.vicente,
+      ...data,
     }))
 
-    // 2. Traffic sources
+    // For sources - use RPC to avoid row limits
+    const { data: sourceData, error: sourceError } = await supabaseAdmin
+      .from('page_views')
+      .select('referrer')
+      .gte('created_at', startDateStr)
+      .in('slug', publishedSlugs.length > 0 ? publishedSlugs : ['__none__'])
+      .limit(50000)
+
+    if (sourceError) {
+      console.error('Source error:', sourceError)
+    }
+
     const sourceMap: Record<string, number> = {}
-    views.forEach(view => {
+    ;(sourceData || []).forEach(view => {
       const source = view.referrer || 'direct'
       sourceMap[source] = (sourceMap[source] || 0) + 1
     })
@@ -113,22 +113,28 @@ export async function GET(request: NextRequest) {
       .map(([referrer, count]) => ({ referrer: referrer === 'direct' ? null : referrer, count }))
       .sort((a, b) => b.count - a.count)
 
-    // 3. Top articles - include all published posts
+    // Top articles via RPC
+    const { data: articleCounts, error: articleError } = await supabaseAdmin
+      .rpc('get_article_counts', {
+        start_date: startDateStr,
+        slug_list: publishedSlugs
+      })
+
+    if (articleError) {
+      console.error('Article RPC error:', articleError)
+    }
+    console.log('Article counts:', articleCounts?.length)
+
     const articleMap: Record<string, number> = {}
-    views.forEach(view => {
-      // Skip the blog overview page for article rankings
-      if (view.slug !== 'blog') {
-        articleMap[view.slug] = (articleMap[view.slug] || 0) + 1
-      }
-    })
-
-    // Count CTA clicks per article
     const ctaMap: Record<string, number> = {}
-    clicks.forEach(click => {
-      ctaMap[click.slug] = (ctaMap[click.slug] || 0) + 1
-    })
+    
+    if (articleCounts && Array.isArray(articleCounts)) {
+      articleCounts.forEach((a: any) => {
+        articleMap[a.slug] = a.views || 0
+        ctaMap[a.slug] = a.clicks || 0
+      })
+    }
 
-    // Build topArticles from all published posts, merging view counts
     const topArticles = (publishedPosts || []).map(post => ({
       slug: post.slug,
       title: post.title,
@@ -137,26 +143,19 @@ export async function GET(request: NextRequest) {
       author: post.author || 'Node Wave',
     })).sort((a, b) => b.views - a.views)
 
-    // 4. Summary stats - only count article views, not blog overview
-    const totalViews = views.length
-    const uniqueVisitors = new Set(views.map(v => v.visitor_id)).size
-    // Only count blog overview views if there are published posts
-    const blogOverviewViews = publishedSlugs.size > 0 ? blogViews.length : 0
-    const totalCtaClicks = clicks.length
-
     return NextResponse.json({
       dailyData,
       sources,
       topArticles,
       summary: {
-        totalViews,
-        uniqueVisitors,
-        blogOverviewViews,
-        totalCtaClicks,
+        totalViews: counts?.total_views ?? 0,
+        uniqueVisitors: counts?.unique_visitors ?? 0,
+        blogOverviewViews: counts?.blog_views ?? 0,
+        totalCtaClicks: counts?.total_cta_clicks ?? 0,
       },
     })
   } catch (error) {
     console.error('Error in analytics endpoint:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error', details: String(error) }, { status: 500 })
   }
 }

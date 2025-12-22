@@ -11,6 +11,7 @@ import { ShareModal } from '@/components/share-modal'
 import { ViewsChart } from '@/components/views-chart'
 import { AddPostPanel } from '@/components/add-post-panel'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { formatNumber } from '@/lib/utils'
 
 type ModalAction = {
   type: 'publish' | 'unpublish' | 'delete'
@@ -105,7 +106,7 @@ export default function AdminDashboard() {
           dailyData: [],
           sources: [],
           topArticles: [],
-          summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0 }
+          summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0, totalCtaClicks: 0 }
         })
       }
     } catch (error) {
@@ -115,7 +116,7 @@ export default function AdminDashboard() {
         dailyData: [],
         sources: [],
         topArticles: [],
-        summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0 }
+        summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0, totalCtaClicks: 0 }
       })
     }
     setAnalyticsLoading(false)
@@ -477,25 +478,25 @@ function LiveContent({
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">Total Views</p>
                 <p className="text-foreground text-2xl font-semibold">
-                  {(analytics?.summary.totalViews ?? 0).toLocaleString()}
+                  {formatNumber(analytics?.summary.totalViews ?? 0)}
                 </p>
               </div>
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">Unique Visitors</p>
                 <p className="text-foreground text-2xl font-semibold">
-                  {(analytics?.summary.uniqueVisitors ?? 0).toLocaleString()}
+                  {formatNumber(analytics?.summary.uniqueVisitors ?? 0)}
                 </p>
               </div>
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">Blog Page Views</p>
                 <p className="text-foreground text-2xl font-semibold">
-                  {(analytics?.summary.blogOverviewViews ?? 0).toLocaleString()}
+                  {formatNumber(analytics?.summary.blogOverviewViews ?? 0)}
                 </p>
               </div>
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">CTA Clicks</p>
                 <p className="text-foreground text-2xl font-semibold">
-                  {(analytics?.summary.totalCtaClicks ?? 0).toLocaleString()}
+                  {formatNumber(analytics?.summary.totalCtaClicks ?? 0)}
                 </p>
               </div>
             </div>
@@ -555,7 +556,7 @@ function LiveContent({
                               {source.referrer || 'Direct'}
                             </span>
                             <span className="text-muted-foreground text-sm tabular-nums">
-                              {source.count.toLocaleString()}
+                              {formatNumber(source.count)}
                             </span>
                           </div>
                         </div>
@@ -622,7 +623,7 @@ function LiveContent({
                             </div>
                             <div className="flex items-center gap-3">
                               <span className="text-muted-foreground text-sm tabular-nums">
-                                {article.views.toLocaleString()}
+                                {formatNumber(article.views)}
                               </span>
                               <span className="text-muted-foreground text-sm tabular-nums w-14 text-right">
                                 {ctr}%
