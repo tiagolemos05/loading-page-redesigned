@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s - Node Wave Blog',
+    template: '%s',
     default: 'Blog - Node Wave',
   },
 }
