@@ -3,6 +3,7 @@
 import { useEffect, useRef, useMemo } from 'react'
 import { getVisitorIdClient, isExcluded } from './page-tracker'
 import { BlogChart } from './blog-chart'
+import { ROICalculator } from './roi-calculator'
 import type { ChartConfig } from '@/lib/chart-schemas'
 
 const TRACKED_URLS = [
@@ -20,13 +21,14 @@ interface TrackedContentProps {
 }
 
 interface ContentSegment {
-  type: 'html' | 'chart'
+  type: 'html' | 'chart' | 'roi-calculator'
   content: string | number // HTML string or chart index
 }
 
 function parseContentWithCharts(html: string): ContentSegment[] {
   const segments: ContentSegment[] = []
-  const markerRegex = /\{\{chart:(\d+)\}\}/g
+  // Match both chart markers and roi-calculator marker
+  const markerRegex = /\{\{(chart:(\d+)|roi-calculator)\}\}/g
   let lastIndex = 0
   let match
 
@@ -39,11 +41,19 @@ function parseContentWithCharts(html: string): ContentSegment[] {
       })
     }
     
-    // Add chart marker
-    segments.push({
-      type: 'chart',
-      content: parseInt(match[1], 10)
-    })
+    // Determine marker type
+    if (match[1] === 'roi-calculator') {
+      segments.push({
+        type: 'roi-calculator',
+        content: ''
+      })
+    } else {
+      // Chart marker
+      segments.push({
+        type: 'chart',
+        content: parseInt(match[2], 10)
+      })
+    }
     
     lastIndex = match.index + match[0].length
   }
@@ -107,8 +117,11 @@ export function TrackedContent({ slug, html, charts, className }: TrackedContent
     return () => container.removeEventListener('click', handleClick)
   }, [slug])
 
-  // If no charts or no markers, render simple HTML
-  if (!chartConfigs.length || segments.length === 1) {
+  // Check if we have any special markers
+  const hasSpecialContent = segments.some(s => s.type !== 'html')
+
+  // If no special content, render simple HTML
+  if (!hasSpecialContent) {
     return (
       <div 
         ref={containerRef}
@@ -127,6 +140,15 @@ export function TrackedContent({ slug, html, charts, className }: TrackedContent
               key={`html-${index}`}
               dangerouslySetInnerHTML={{ __html: segment.content as string }}
             />
+          )
+        }
+        
+        // ROI Calculator segment
+        if (segment.type === 'roi-calculator') {
+          return (
+            <div key={`roi-${index}`} className="my-8">
+              <ROICalculator embed />
+            </div>
           )
         }
         

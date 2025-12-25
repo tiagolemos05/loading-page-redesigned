@@ -122,7 +122,13 @@ When appropriate, include inline calls-to-action within the content to drive eng
 • Free process analysis (no commitment): https://www.nodewave.io/#contact-section
 • Schedule a 30-minute consultation: https://cal.com/tiago-lemos-p1wrn8/30min
 
-Example: "Want us to analyze your current workflow? [Get in touch](https://www.nodewave.io/#contact-section) for a free assessment."`
+Example: "Want us to analyze your current workflow? [Get in touch](https://www.nodewave.io/#contact-section) for a free assessment."
+
+Interactive ROI Calculator:
+You can embed an interactive ROI calculator in blog posts using the marker {{roi-calculator}}. This is especially useful for posts about automation ROI, cost savings, or process optimization. The calculator lets readers estimate their own savings, increasing engagement and time on page.
+
+Example usage in content:
+"Wondering what automation could save you? Try our calculator:\n\n{{roi-calculator}}\n\nThe calculator considers your task type, time spent, and process complexity."`
 
   const copyToClipboard = async (text: string, type: 'example' | 'prompt') => {
     await navigator.clipboard.writeText(text)
