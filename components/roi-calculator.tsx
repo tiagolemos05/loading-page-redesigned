@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, ArrowLeft, Loader2, Mail, Calendar } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Loader2, Mail, Calendar, ChevronDown } from 'lucide-react'
 import { BlogChart } from './blog-chart'
 
 // Types
@@ -106,9 +106,31 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
   const [exitMessage, setExitMessage] = useState<string | null>(null)
   const [showEmailCapture, setShowEmailCapture] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
+  const [hasUserScrolled, setHasUserScrolled] = useState(false)
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const resultsScrollRef = useRef<HTMLDivElement>(null)
 
   const progress = (currentStep / TOTAL_STEPS) * 100
+
+  // Check if content is scrollable for scroll indicator
+  useEffect(() => {
+    if (result && !hasUserScrolled) {
+      const timeout = setTimeout(() => {
+        const container = resultsScrollRef.current
+        if (!container) return
+        
+        // Check if content is actually scrollable
+        if (container.scrollHeight > container.clientHeight) {
+          setShowScrollIndicator(true)
+        } else {
+          setShowScrollIndicator(false)
+        }
+      }, 500)
+      
+      return () => clearTimeout(timeout)
+    }
+  }, [result, hasUserScrolled])
 
   // Check exit conditions
   const checkEarlyExit = (step: number, data: FormData): string | null => {
@@ -218,6 +240,8 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
     setExitMessage(null)
     setShowEmailCapture(false)
     setEmailSent(false)
+    setHasUserScrolled(false)
+    setShowScrollIndicator(false)
   }
 
   const containerHeight = embed ? 'h-[500px]' : 'h-[600px]'
@@ -284,7 +308,14 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
         <div
           className="flex flex-col h-full overflow-hidden"
         >
-          <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-hide">
+          <div 
+            ref={resultsScrollRef}
+            onScroll={() => {
+              setHasUserScrolled(true)
+              setShowScrollIndicator(false)
+            }}
+            className="flex-1 overflow-y-auto px-4 py-4 scrollbar-hide"
+          >
             {/* ROI Highlight */}
             <div className="bg-primary/10 border border-primary/20 rounded-xl p-6 mb-6 text-center">
               <p className="text-sm text-muted-foreground mb-2">Estimated Monthly Savings</p>
@@ -348,6 +379,18 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               </p>
             )}
           </div>
+
+          {/* Scroll indicator */}
+          {showScrollIndicator && !hasUserScrolled && (
+            <div className="flex justify-center py-2 border-t border-foreground/[0.06]">
+              <motion.div
+                animate={{ y: [0, 4, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              </motion.div>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="p-4 border-t border-foreground/[0.06] flex gap-3 flex-shrink-0">
