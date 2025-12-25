@@ -13,10 +13,17 @@ export function Header() {
 
   const navItems = [
     { name: "Services", href: "#features-section" },
+    { name: "ROI Calculator", href: "/tools/roi-calculator" },
     { name: "Contact", href: "#contact-section" },
   ]
 
-  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    // Only handle scroll for hash links
+    if (!href.startsWith('#')) {
+      setIsOpen(false)
+      return
+    }
+    
     e.preventDefault()
     const targetId = href.substring(1)
     const targetElement = document.getElementById(targetId)
@@ -45,7 +52,7 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                onClick={(e) => handleScroll(e, item.href)}
+                onClick={(e) => handleNavClick(e, item.href)}
                 className="text-[#888888] hover:text-foreground px-4 py-2 rounded-full font-medium transition-colors"
               >
                 {item.name}
@@ -75,13 +82,13 @@ export function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={(e) => handleScroll(e, item.href)}
+                    onClick={(e) => handleNavClick(e, item.href)}
                     className="text-[#888888] hover:text-foreground justify-start text-lg py-2"
                   >
                     {item.name}
                   </Link>
                 ))}
-                <Link href="#contact-section" onClick={(e) => handleScroll(e, "#contact-section")} className="w-full mt-4">
+                <Link href="#contact-section" onClick={(e) => handleNavClick(e, "#contact-section")} className="w-full mt-4">
                   <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 px-6 py-2 rounded-full font-medium shadow-sm">
                     Get Started
                   </Button>
