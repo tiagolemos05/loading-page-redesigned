@@ -546,23 +546,37 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
       <div className="px-4 py-3 border-b border-foreground/[0.06]">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            {!result && (
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            )}
             <span className="text-sm font-medium text-foreground">ROI Calculator</span>
           </div>
-          {embed && (
-            <a 
-              href="https://www.nodewave.io" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:text-primary transition-colors"
-            >
-              Powered by Node Wave
-            </a>
-          )}
+          <div className="flex items-center gap-2">
+            {result && (
+              <div className="flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 text-foreground">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+                <span className="text-sm font-medium text-foreground">Done</span>
+              </div>
+            )}
+            {embed && (
+              <a 
+                href="https://www.nodewave.io" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                Powered by Node Wave
+              </a>
+            )}
+          </div>
         </div>
         {/* Progress bar - always reserve space */}
         <div className="h-1 w-full bg-foreground/[0.06] rounded-full overflow-hidden">
-          {!result && !exitMessage && (
+          {result ? (
+            <div className="h-full w-full bg-primary rounded-full" />
+          ) : !exitMessage && (
             <motion.div 
               className="h-full bg-primary rounded-full"
               initial={{ width: 0 }}
