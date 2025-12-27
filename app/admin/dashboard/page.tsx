@@ -737,6 +737,21 @@ function PostItem({
           >
             Edit
           </Link>
+          <button
+            onClick={() => {
+              const { id, created_at, updated_at, charts, ...exportData } = post
+              const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `${post.slug}.json`
+              a.click()
+              URL.revokeObjectURL(url)
+            }}
+            className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-foreground/[0.06] rounded transition-colors"
+          >
+            Export
+          </button>
           {onShare && (
             <button
               onClick={() => onShare(post)}

@@ -195,13 +195,6 @@ export default async function BlogPostPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Description as lead paragraph */}
-          {post.description && (
-            <p className="text-muted-foreground text-lg md:text-xl leading-relaxed mb-8 relative z-10">
-              {post.description}
-            </p>
-          )}
-
           {/* Article content */}
           <article className="relative z-10">
             <TrackedContent 
