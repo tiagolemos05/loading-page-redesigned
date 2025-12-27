@@ -175,7 +175,7 @@ export default function AdminPreview() {
               slug={slug}
               html={contentHtml}
               charts={post.charts}
-              className="prose prose-invert prose-lg max-w-none
+              className="prose prose-invert max-w-none
                 prose-headings:text-foreground prose-headings:font-semibold
                 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
                 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3

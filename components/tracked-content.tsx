@@ -75,6 +75,33 @@ export function TrackedContent({ slug, html, charts, className }: TrackedContent
   const segments = useMemo(() => parseContentWithCharts(html), [html])
   const chartConfigs = useMemo(() => (charts || []) as ChartConfig[], [charts])
 
+  // Wrap tables in scrollable container for mobile
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const tables = container.querySelectorAll('table')
+    tables.forEach((table) => {
+      // Skip if already wrapped
+      if (table.parentElement?.classList.contains('table-wrapper')) return
+      
+      const wrapper = document.createElement('div')
+      wrapper.className = 'table-wrapper'
+      table.parentNode?.insertBefore(wrapper, table)
+      wrapper.appendChild(table)
+      
+      // Handle scroll indicator
+      const handleScroll = () => {
+        const isAtEnd = wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 5
+        wrapper.classList.toggle('scrolled-end', isAtEnd)
+      }
+      
+      wrapper.addEventListener('scroll', handleScroll)
+      // Check initial state
+      handleScroll()
+    })
+  }, [html])
+
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
