@@ -323,7 +323,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               href="https://cal.com/tiago-lemos-p1wrn8/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-4 py-3 text-sm rounded-full bg-primary text-primary-foreground text-center
+              className="flex-1 px-4 py-3 text-sm rounded-full bg-primary text-background text-center
                 hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
@@ -408,7 +408,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
                     <button
                       onClick={handleEmailSubmit}
                       disabled={!formData.email.trim()}
-                      className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground
+                      className="px-4 py-2 text-sm rounded-lg bg-primary text-background
                         hover:bg-primary/90 transition-colors disabled:opacity-50"
                     >
                       Send
@@ -449,7 +449,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               href="https://cal.com/tiago-lemos-p1wrn8/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-4 py-2.5 sm:py-3 text-sm rounded-full bg-primary text-primary-foreground text-center
+              className="flex-1 px-4 py-2.5 sm:py-3 text-sm rounded-full bg-primary text-background text-center
                 hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
@@ -602,7 +602,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               <button
                 onClick={handleProcessSubmit}
                 disabled={!formData.processDescription.trim() || isLoading}
-                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 text-sm rounded-xl bg-primary text-primary-foreground
+                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 text-sm rounded-xl bg-primary text-background
                   hover:bg-primary/90 transition-colors font-medium disabled:opacity-50
                   flex items-center justify-center gap-2"
               >
