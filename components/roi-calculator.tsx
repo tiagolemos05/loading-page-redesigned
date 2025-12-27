@@ -323,7 +323,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               href="https://cal.com/tiago-lemos-p1wrn8/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-4 py-3 text-sm rounded-full bg-primary text-background text-center
+              className="flex-1 px-4 py-3 text-sm rounded-full bg-primary text-[#0f1211] text-center
                 hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
@@ -402,13 +402,13 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="your@email.com"
-                      className="flex-1 bg-background border border-foreground/[0.1] rounded-lg px-3 py-2 text-sm
+                      className="flex-1 bg-background border border-foreground/[0.1] rounded-lg px-3 py-2 text-base sm:text-sm
                         text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
                     />
                     <button
                       onClick={handleEmailSubmit}
                       disabled={!formData.email.trim()}
-                      className="px-4 py-2 text-sm rounded-lg bg-primary text-background
+                      className="px-4 py-2 text-sm rounded-lg bg-primary text-[#0f1211]
                         hover:bg-primary/90 transition-colors disabled:opacity-50"
                     >
                       Send
@@ -449,7 +449,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               href="https://cal.com/tiago-lemos-p1wrn8/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-4 py-2.5 sm:py-3 text-sm rounded-full bg-primary text-background text-center
+              className="flex-1 px-4 py-2.5 sm:py-3 text-sm rounded-full bg-primary text-[#0f1211] text-center
                 hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
@@ -486,7 +486,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
                     value={formData.customTaskType}
                     onChange={(e) => setFormData({ ...formData, customTaskType: e.target.value })}
                     placeholder="E.g., Order fulfillment, HR onboarding..."
-                    className="w-full bg-foreground/[0.03] border border-foreground/[0.1] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-14 sm:pr-16 text-sm
+                    className="w-full bg-foreground/[0.03] border border-foreground/[0.1] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-14 sm:pr-16 text-base sm:text-sm
                       text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
                     onKeyDown={(e) => e.key === 'Enter' && handleCustomTaskSubmit()}
                   />
@@ -595,14 +595,14 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
                 onChange={(e) => setFormData({ ...formData, processDescription: e.target.value })}
                 placeholder="E.g., We receive invoices via email, manually enter data into our ERP, cross-check against purchase orders, then route for approval..."
                 rows={4}
-                className="w-full bg-foreground/[0.03] border border-foreground/[0.1] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm
+                className="w-full bg-foreground/[0.03] border border-foreground/[0.1] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm
                   text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary
                   resize-none"
               />
               <button
                 onClick={handleProcessSubmit}
                 disabled={!formData.processDescription.trim() || isLoading}
-                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 text-sm rounded-xl bg-primary text-background
+                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 text-sm rounded-xl bg-primary text-[#0f1211]
                   hover:bg-primary/90 transition-colors font-medium disabled:opacity-50
                   flex items-center justify-center gap-2"
               >
