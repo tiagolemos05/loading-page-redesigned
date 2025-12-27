@@ -170,12 +170,6 @@ export default function AdminPreview() {
             </div>
           </div>
 
-          {post.description && (
-            <p className="text-muted-foreground text-lg md:text-xl leading-relaxed mb-8 relative z-10">
-              {post.description}
-            </p>
-          )}
-
           <article className="relative z-10">
             <TrackedContent 
               slug={slug}
