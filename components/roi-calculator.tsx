@@ -244,32 +244,35 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
     setShowScrollIndicator(false)
   }
 
-  const containerHeight = embed ? 'h-[500px]' : 'h-[600px]'
+  const containerHeight = embed 
+    ? 'h-[500px] max-h-[70vh] min-h-[400px]' 
+    : 'h-[600px] max-h-[80vh] min-h-[450px]'
 
   // Render current step content
   const renderStep = () => {
     // Exit message screen
     if (exitMessage) {
       return (
-        <div
-          className="flex flex-col h-full p-6"
-        >
-          <div className="flex-1 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full bg-[#CF6679]/15 flex items-center justify-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-8 h-8 text-[#CF6679]">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-            </svg>
+        <div className="flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+            <div className="flex flex-col items-center justify-center text-center min-h-full">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[#CF6679]/15 flex items-center justify-center mb-4 sm:mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 sm:w-8 sm:h-8 text-[#CF6679]">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">
+                Not the Right Fit for Automation
+              </h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6 max-w-md">
+                {exitMessage}
+              </p>
+            </div>
           </div>
-          <h3 className="text-xl font-semibold text-foreground mb-4">
-            Not the Right Fit for Automation
-          </h3>
-          <p className="text-muted-foreground leading-relaxed mb-8 max-w-md">
-            {exitMessage}
-          </p>
-          <div className="flex gap-3">
+          <div className="p-4 border-t border-foreground/[0.06] flex flex-col sm:flex-row gap-2 sm:gap-3 flex-shrink-0">
             <button
               onClick={resetCalculator}
-              className="px-6 py-3 text-sm rounded-full border border-foreground/[0.1] text-foreground
+              className="flex-1 px-4 py-3 text-sm rounded-full border border-foreground/[0.1] text-foreground
                 hover:bg-foreground/[0.05] transition-colors"
             >
               Try Another Process
@@ -278,13 +281,12 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               href="https://cal.com/tiago-lemos-p1wrn8/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 text-sm rounded-full bg-primary text-primary-foreground
-                hover:bg-primary/90 transition-colors font-medium flex items-center gap-2"
+              className="flex-1 px-4 py-3 text-sm rounded-full bg-primary text-primary-foreground text-center
+                hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
               Discuss Alternatives
             </a>
-            </div>
           </div>
         </div>
       )
@@ -314,35 +316,35 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               setHasUserScrolled(true)
               setShowScrollIndicator(false)
             }}
-            className="flex-1 overflow-y-auto px-4 py-4 scrollbar-hide"
+            className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 sm:py-4 scrollbar-hide"
           >
             {/* ROI Highlight */}
-            <div className="bg-primary/10 border border-primary/20 rounded-xl p-6 mb-6 text-center">
-              <p className="text-sm text-muted-foreground mb-2">Estimated Monthly Savings</p>
-              <p className="text-3xl font-bold text-primary">
+            <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 text-center">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">Estimated Monthly Savings</p>
+              <p className="text-2xl sm:text-3xl font-bold text-primary">
                 €{result.monthlySavingsLow.toLocaleString()} - €{result.monthlySavingsHigh.toLocaleString()}
               </p>
-              <p className="text-sm text-muted-foreground mt-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">
                 €{result.yearlySavingsLow.toLocaleString()} - €{result.yearlySavingsHigh.toLocaleString()} per year
               </p>
             </div>
 
             {/* Chart */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <BlogChart config={chartConfig} />
             </div>
 
             {/* AI Explanation */}
-            <div className="bg-foreground/[0.03] rounded-xl p-4 mb-4">
-              <h4 className="text-sm font-medium text-foreground mb-2">How This Could Work</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+            <div className="bg-foreground/[0.03] rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
+              <h4 className="text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">How This Could Work</h4>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {result.automationExplanation}
               </p>
             </div>
 
             {/* Email Capture */}
             {!emailSent && (
-              <div className="bg-foreground/[0.03] rounded-xl p-4 mb-4">
+              <div className="bg-foreground/[0.03] rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
                 {!showEmailCapture ? (
                   <button
                     onClick={() => setShowEmailCapture(true)}
@@ -352,7 +354,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
                     Send me this report
                   </button>
                 ) : (
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="email"
                       value={formData.email}
@@ -393,10 +395,10 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
           )}
 
           {/* Actions */}
-          <div className="p-4 border-t border-foreground/[0.06] flex gap-3 flex-shrink-0">
+          <div className="p-3 sm:p-4 border-t border-foreground/[0.06] flex flex-col sm:flex-row gap-2 sm:gap-3 flex-shrink-0">
             <button
               onClick={resetCalculator}
-              className="flex-1 px-4 py-3 text-sm rounded-full border border-foreground/[0.1] text-foreground
+              className="flex-1 px-4 py-2.5 sm:py-3 text-sm rounded-full border border-foreground/[0.1] text-foreground
                 hover:bg-foreground/[0.05] transition-colors"
             >
               Calculate Another
@@ -405,7 +407,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
               href="https://cal.com/tiago-lemos-p1wrn8/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-4 py-3 text-sm rounded-full bg-primary text-primary-foreground text-center
+              className="flex-1 px-4 py-2.5 sm:py-3 text-sm rounded-full bg-primary text-primary-foreground text-center
                 hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
@@ -424,7 +426,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
             title="What type of task do you want to automate?"
             showBack={false}
           >
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {TASK_TYPES.map((type) => (
                 <OptionButton
                   key={type}
@@ -434,15 +436,15 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
                 />
               ))}
               
-              <div className="pt-6 mt-3 border-t border-foreground/[0.06]">
-                <h3 className="text-lg font-semibold text-foreground mb-3">Or describe your own</h3>
+              <div className="pt-4 sm:pt-6 mt-2 sm:mt-3 border-t border-foreground/[0.06]">
+                <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Or describe your own</h3>
                 <div className="relative">
                   <input
                     type="text"
                     value={formData.customTaskType}
                     onChange={(e) => setFormData({ ...formData, customTaskType: e.target.value })}
                     placeholder="E.g., Order fulfillment, HR onboarding..."
-                    className="w-full bg-foreground/[0.03] border border-foreground/[0.1] rounded-xl px-4 py-3 pr-16 text-sm
+                    className="w-full bg-foreground/[0.03] border border-foreground/[0.1] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-14 sm:pr-16 text-sm
                       text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
                     onKeyDown={(e) => e.key === 'Enter' && handleCustomTaskSubmit()}
                   />
@@ -466,7 +468,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
             title="How much time do you spend on this per week?"
             onBack={handleBack}
           >
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {HOURS_OPTIONS.map((option) => (
                 <OptionButton
                   key={option.value}
@@ -485,7 +487,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
             title="What's the hourly cost of labor for this task?"
             onBack={handleBack}
           >
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {HOURLY_RATE_OPTIONS.map((option) => (
                 <OptionButton
                   key={option.value}
@@ -504,7 +506,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
             title="How many people work on this task?"
             onBack={handleBack}
           >
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {PEOPLE_COUNT_OPTIONS.map((option) => (
                 <OptionButton
                   key={option.value}
@@ -523,7 +525,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
             title="How much human judgment does this process require?"
             onBack={handleBack}
           >
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {JUDGMENT_OPTIONS.map((option) => (
                 <OptionButton
                   key={option.value}
@@ -544,21 +546,21 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
             subtitle="Help us understand how you currently handle this task"
             onBack={handleBack}
           >
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <textarea
                 ref={textareaRef}
                 value={formData.processDescription}
                 onChange={(e) => setFormData({ ...formData, processDescription: e.target.value })}
                 placeholder="E.g., We receive invoices via email, manually enter data into our ERP, cross-check against purchase orders, then route for approval..."
-                rows={5}
-                className="w-full bg-foreground/[0.03] border border-foreground/[0.1] rounded-xl px-4 py-3 text-sm
+                rows={4}
+                className="w-full bg-foreground/[0.03] border border-foreground/[0.1] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm
                   text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary
                   resize-none"
               />
               <button
                 onClick={handleProcessSubmit}
                 disabled={!formData.processDescription.trim() || isLoading}
-                className="w-full px-6 py-3 text-sm rounded-xl bg-primary text-primary-foreground
+                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 text-sm rounded-xl bg-primary text-primary-foreground
                   hover:bg-primary/90 transition-colors font-medium disabled:opacity-50
                   flex items-center justify-center gap-2"
               >
@@ -586,7 +588,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
   return (
     <div className={`flex flex-col ${containerHeight} w-full max-w-2xl mx-auto bg-background rounded-xl border border-foreground/[0.06] overflow-hidden`}>
       {/* Header with progress */}
-      <div className="px-4 py-3 border-b border-foreground/[0.06]">
+      <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-foreground/[0.06] flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             {!result && (
@@ -664,19 +666,19 @@ function StepContainer({
   onBack?: () => void
 }) {
   return (
-    <div className="flex flex-col h-full p-6">
+    <div className="flex flex-col h-full p-4 sm:p-6">
       {showBack && onBack && (
         <button
           onClick={onBack}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 self-start"
+          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3 sm:mb-4 self-start"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
       )}
-      <h2 className="text-lg font-semibold text-foreground mb-2">{title}</h2>
+      <h2 className="text-base sm:text-lg font-semibold text-foreground mb-2">{title}</h2>
       {subtitle && (
-        <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>
+        <p className="text-sm text-muted-foreground mb-3 sm:mb-4">{subtitle}</p>
       )}
       <div className="flex-1 overflow-y-auto scrollbar-hide">
         {children}
@@ -699,7 +701,7 @@ function OptionButton({
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
+      className={`w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border transition-all ${
         selected 
           ? 'border-primary bg-primary/10 text-foreground' 
           : 'border-foreground/[0.08] bg-foreground/[0.02] text-foreground hover:border-foreground/[0.15] hover:bg-foreground/[0.04]'
