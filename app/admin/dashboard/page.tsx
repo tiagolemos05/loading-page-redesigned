@@ -9,6 +9,7 @@ import { SourcesModal } from '@/components/sources-modal'
 import { ArticlesModal } from '@/components/articles-modal'
 import { ShareModal } from '@/components/share-modal'
 import { ViewsChart } from '@/components/views-chart'
+import { AICrawlsChart } from '@/components/ai-crawls-chart'
 import { AddPostPanel } from '@/components/add-post-panel'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { formatNumber } from '@/lib/utils'
@@ -32,6 +33,21 @@ type AnalyticsData = {
   }
 }
 
+type AIAnalyticsData = {
+  dailyData: { date: string; crawls: number; gptbot: number; claudebot: number; perplexitybot: number; other: number }[]
+  crawlers: { name: string; count: number }[]
+  topArticles: { slug: string; title: string; crawls: number }[]
+  topPaths: { path: string; count: number }[]
+  summary: {
+    totalCrawls: number
+    uniqueCrawlers: number
+    blogCrawls: number
+    successfulCrawls: number
+  }
+}
+
+type AnalyticsMode = 'search' | 'ai'
+
 export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +55,9 @@ export default function AdminDashboard() {
   const [modalAction, setModalAction] = useState<ModalAction>(null)
   const [activeTab, setActiveTab] = useState<'drafts' | 'live'>('live')
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('28')
+  const [analyticsMode, setAnalyticsMode] = useState<AnalyticsMode>('search')
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [aiAnalytics, setAIAnalytics] = useState<AIAnalyticsData | null>(null)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [showSourcesModal, setShowSourcesModal] = useState(false)
   const [showArticlesModal, setShowArticlesModal] = useState(false)
@@ -62,7 +80,7 @@ export default function AdminDashboard() {
     if (activeTab === 'live' && user) {
       fetchAnalytics()
     }
-  }, [activeTab, timeFrame, user])
+  }, [activeTab, timeFrame, analyticsMode, user])
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -90,8 +108,9 @@ export default function AdminDashboard() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       const days = timeFrame === 'all' ? '365' : timeFrame
+      const endpoint = analyticsMode === 'ai' ? '/api/ai-analytics' : '/api/analytics'
       
-      const response = await fetch(`/api/analytics?days=${days}`, {
+      const response = await fetch(`${endpoint}?days=${days}`, {
         headers: {
           'Authorization': `Bearer ${session?.access_token}`,
         },
@@ -99,9 +118,42 @@ export default function AdminDashboard() {
       
       if (response.ok) {
         const data = await response.json()
-        setAnalytics(data)
+        if (analyticsMode === 'ai') {
+          setAIAnalytics(data)
+        } else {
+          setAnalytics(data)
+        }
       } else {
         // Set empty analytics on error
+        if (analyticsMode === 'ai') {
+          setAIAnalytics({
+            dailyData: [],
+            crawlers: [],
+            topArticles: [],
+            topPaths: [],
+            summary: { totalCrawls: 0, uniqueCrawlers: 0, blogCrawls: 0, successfulCrawls: 0 }
+          })
+        } else {
+          setAnalytics({
+            dailyData: [],
+            sources: [],
+            topArticles: [],
+            summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0, totalCtaClicks: 0 }
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error)
+      // Set empty analytics on error
+      if (analyticsMode === 'ai') {
+        setAIAnalytics({
+          dailyData: [],
+          crawlers: [],
+          topArticles: [],
+          topPaths: [],
+          summary: { totalCrawls: 0, uniqueCrawlers: 0, blogCrawls: 0, successfulCrawls: 0 }
+        })
+      } else {
         setAnalytics({
           dailyData: [],
           sources: [],
@@ -109,15 +161,6 @@ export default function AdminDashboard() {
           summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0, totalCtaClicks: 0 }
         })
       }
-    } catch (error) {
-      console.error('Failed to fetch analytics:', error)
-      // Set empty analytics on error
-      setAnalytics({
-        dailyData: [],
-        sources: [],
-        topArticles: [],
-        summary: { totalViews: 0, uniqueVisitors: 0, blogOverviewViews: 0, totalCtaClicks: 0 }
-      })
     }
     setAnalyticsLoading(false)
   }
@@ -314,6 +357,9 @@ export default function AdminDashboard() {
             <LiveContent
               posts={livePosts}
               analytics={analytics}
+              aiAnalytics={aiAnalytics}
+              analyticsMode={analyticsMode}
+              setAnalyticsMode={setAnalyticsMode}
               analyticsLoading={analyticsLoading}
               timeFrame={timeFrame}
               setTimeFrame={setTimeFrame}
@@ -416,6 +462,9 @@ function DraftsList({
 function LiveContent({
   posts,
   analytics,
+  aiAnalytics,
+  analyticsMode,
+  setAnalyticsMode,
   analyticsLoading,
   timeFrame,
   setTimeFrame,
@@ -427,6 +476,9 @@ function LiveContent({
 }: {
   posts: Post[]
   analytics: AnalyticsData | null
+  aiAnalytics: AIAnalyticsData | null
+  analyticsMode: AnalyticsMode
+  setAnalyticsMode: (mode: AnalyticsMode) => void
   analyticsLoading: boolean
   timeFrame: TimeFrame
   setTimeFrame: (tf: TimeFrame) => void
@@ -447,9 +499,31 @@ function LiveContent({
     <div className="space-y-8">
       {/* Analytics Section */}
       <div className="space-y-6">
-        {/* Time frame selector */}
+        {/* Analytics mode and time frame selector */}
         <div className="flex items-center justify-between">
-          <h2 className="text-foreground text-lg font-medium">Analytics</h2>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setAnalyticsMode('search')}
+              className={`text-lg font-medium transition-colors ${
+                analyticsMode === 'search'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Search Analytics
+            </button>
+            <span className="text-foreground/20">|</span>
+            <button
+              onClick={() => setAnalyticsMode('ai')}
+              className={`text-lg font-medium transition-colors ${
+                analyticsMode === 'ai'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              AI Analytics
+            </button>
+          </div>
           <div className="flex gap-1 bg-foreground/[0.03] rounded-lg p-1">
             {timeFrameOptions.map(option => (
               <button
@@ -471,9 +545,161 @@ function LiveContent({
           <div className="h-64 flex items-center justify-center">
             <p className="text-muted-foreground">Loading analytics...</p>
           </div>
+        ) : analyticsMode === 'ai' ? (
+          <>
+            {/* AI Summary Stats */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
+                <p className="text-muted-foreground text-sm mb-1">Total Crawls</p>
+                <p className="text-foreground text-2xl font-semibold">
+                  {formatNumber(aiAnalytics?.summary.totalCrawls ?? 0)}
+                </p>
+              </div>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
+                <p className="text-muted-foreground text-sm mb-1">Unique Crawlers</p>
+                <p className="text-foreground text-2xl font-semibold">
+                  {formatNumber(aiAnalytics?.summary.uniqueCrawlers ?? 0)}
+                </p>
+              </div>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
+                <p className="text-muted-foreground text-sm mb-1">Blog Crawls</p>
+                <p className="text-foreground text-2xl font-semibold">
+                  {formatNumber(aiAnalytics?.summary.blogCrawls ?? 0)}
+                </p>
+              </div>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
+                <p className="text-muted-foreground text-sm mb-1">Success Rate</p>
+                <p className="text-foreground text-2xl font-semibold">
+                  {aiAnalytics?.summary.totalCrawls 
+                    ? Math.round((aiAnalytics.summary.successfulCrawls / aiAnalytics.summary.totalCrawls) * 100) 
+                    : 0}%
+                </p>
+              </div>
+            </div>
+
+            {/* AI Crawls Chart */}
+            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6 overflow-visible">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-foreground font-medium">Crawls Over Time</h3>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="text-muted-foreground">GPT</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-orange-500" />
+                    <span className="text-muted-foreground">Claude</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                    <span className="text-muted-foreground">Perplexity</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-gray-500" />
+                    <span className="text-muted-foreground">Other</span>
+                  </div>
+                </div>
+              </div>
+              <AICrawlsChart data={aiAnalytics?.dailyData ?? []} formatDateShort={formatDateShort} />
+            </div>
+
+            {/* Two column layout for crawlers and top articles */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Top Crawlers */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
+                <h3 className="text-foreground font-medium mb-4">Crawlers</h3>
+                {(aiAnalytics?.crawlers.length ?? 0) === 0 ? (
+                  <p className="text-muted-foreground text-sm">No crawl data yet</p>
+                ) : (
+                  <div className="space-y-3">
+                    {(aiAnalytics?.crawlers ?? []).slice(0, 5).map((crawler) => {
+                      const totalCrawls = (aiAnalytics?.crawlers ?? []).reduce((sum, c) => sum + c.count, 0)
+                      const percentage = totalCrawls > 0 ? (crawler.count / totalCrawls) * 100 : 0
+                      return (
+                        <div key={crawler.name} className="relative">
+                          <div 
+                            className="absolute inset-0 bg-primary/10 rounded"
+                            style={{ width: `${percentage}%` }}
+                          />
+                          <div className="relative flex items-center justify-between py-1.5 px-2">
+                            <span className="text-foreground text-sm">
+                              {crawler.name}
+                            </span>
+                            <span className="text-muted-foreground text-sm tabular-nums">
+                              {formatNumber(crawler.count)}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Top Crawled Articles */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
+                <h3 className="text-foreground font-medium mb-4">Top Crawled Articles</h3>
+                {(aiAnalytics?.topArticles.length ?? 0) === 0 ? (
+                  <p className="text-muted-foreground text-sm">No article crawls yet</p>
+                ) : (
+                  <div className="space-y-3">
+                    {(aiAnalytics?.topArticles ?? []).slice(0, 5).map((article) => {
+                      const maxCrawls = aiAnalytics?.topArticles[0]?.crawls || 1
+                      const percentage = (article.crawls / maxCrawls) * 100
+                      return (
+                        <div key={article.slug} className="relative">
+                          <div 
+                            className="absolute inset-0 bg-primary/10 rounded"
+                            style={{ width: `${percentage}%` }}
+                          />
+                          <div className="relative flex items-center justify-between py-1.5 px-2">
+                            <span className="text-foreground text-sm truncate max-w-[70%]">
+                              {article.title}
+                            </span>
+                            <span className="text-muted-foreground text-sm tabular-nums">
+                              {formatNumber(article.crawls)}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Top Crawled Paths */}
+            {(aiAnalytics?.topPaths.length ?? 0) > 0 && (
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-6">
+                <h3 className="text-foreground font-medium mb-4">Top Crawled Paths (Non-Blog)</h3>
+                <div className="space-y-3">
+                  {(aiAnalytics?.topPaths ?? []).slice(0, 5).map((path) => {
+                    const maxCount = aiAnalytics?.topPaths[0]?.count || 1
+                    const percentage = (path.count / maxCount) * 100
+                    return (
+                      <div key={path.path} className="relative">
+                        <div 
+                          className="absolute inset-0 bg-primary/10 rounded"
+                          style={{ width: `${percentage}%` }}
+                        />
+                        <div className="relative flex items-center justify-between py-1.5 px-2">
+                          <span className="text-foreground text-sm font-mono">
+                            {path.path}
+                          </span>
+                          <span className="text-muted-foreground text-sm tabular-nums">
+                            {formatNumber(path.count)}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <>
-            {/* Summary Stats */}
+            {/* Search Summary Stats */}
             <div className="grid grid-cols-4 gap-4">
               <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-4">
                 <p className="text-muted-foreground text-sm mb-1">Total Views</p>

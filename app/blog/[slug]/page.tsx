@@ -99,6 +99,33 @@ function generateArticleJsonLd(post: {
   }
 }
 
+function generateBreadcrumbJsonLd(post: { title: string; slug: string }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: BASE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: `${BASE_URL}/blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: `${BASE_URL}/blog/${post.slug}`,
+      },
+    ],
+  }
+}
+
 function ContentGrid() {
   return (
     <div className="absolute inset-0 pointer-events-none hidden md:block overflow-visible" style={{ left: '-80px', right: '-80px' }}>
@@ -143,12 +170,17 @@ export default async function BlogPostPage({ params }: PageProps) {
   }
 
   const jsonLd = generateArticleJsonLd(post)
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(post)
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <PageTracker slug={slug} />
       <BlogHeader />
