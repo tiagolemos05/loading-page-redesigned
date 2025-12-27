@@ -630,7 +630,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
   // Embedded version: fixed height to show all of step 0
   if (embed) {
     return (
-      <div className="flex flex-col h-[520px] w-full max-w-2xl mx-auto bg-background rounded-xl border border-foreground/[0.06] overflow-hidden">
+      <div className="flex flex-col h-[620px] w-full max-w-2xl mx-auto bg-background rounded-xl border border-foreground/[0.06] overflow-hidden">
         {/* Header with progress */}
         <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-foreground/[0.06] flex-shrink-0">
           <div className="flex items-center justify-between mb-2">
