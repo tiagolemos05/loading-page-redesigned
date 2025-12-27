@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-// Lazy-load OpenAI client to avoid build-time errors
-let openai: OpenAI | null = null
-function getOpenAI() {
-  if (!openai) {
-    openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+// Lazy-load OpenRouter client (OpenAI-compatible API)
+let openrouter: OpenAI | null = null
+function getOpenRouter() {
+  if (!openrouter) {
+    openrouter = new OpenAI({
+      baseURL: 'https://openrouter.ai/api/v1',
+      apiKey: process.env.OPENROUTER_API_KEY,
     })
   }
-  return openai
+  return openrouter
 }
 
 interface FormData {
@@ -107,8 +108,8 @@ export async function POST(request: NextRequest) {
     // Call AI to analyze the process and generate explanation
     const systemPrompt = buildAnalysisPrompt(formData)
 
-    const completion = await getOpenAI().chat.completions.create({
-      model: 'gpt-4o-mini',
+    const completion = await getOpenRouter().chat.completions.create({
+      model: 'google/gemini-3-flash-preview',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: 'Analyze this process and provide your assessment.' }
