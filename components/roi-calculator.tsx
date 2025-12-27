@@ -88,7 +88,21 @@ const JUDGMENT_OPTIONS = [
 
 const TOTAL_STEPS = 6
 
+// Check if we're on nodewave.io domain
+function useIsNodewaveDomain() {
+  const [isNodewave, setIsNodewave] = useState(false)
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsNodewave(window.location.hostname.includes('nodewave.io'))
+    }
+  }, [])
+  
+  return isNodewave
+}
+
 export function ROICalculator({ embed = false }: { embed?: boolean }) {
+  const isNodewaveDomain = useIsNodewaveDomain()
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<FormData>({
     taskType: '',
@@ -108,10 +122,36 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
   const [emailSent, setEmailSent] = useState(false)
   const [hasUserScrolled, setHasUserScrolled] = useState(false)
   const [showScrollIndicator, setShowScrollIndicator] = useState(false)
+  const [contentHeight, setContentHeight] = useState<number>(480)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const resultsScrollRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   const progress = (currentStep / TOTAL_STEPS) * 100
+
+  // Define heights per step for smooth animation (page version only)
+  const stepHeights: Record<number, number> = {
+    0: 450, // Task type + custom input
+    1: 370, // Hours options
+    2: 370, // Hourly rate options  
+    3: 370, // People count options
+    4: 450, // Judgment options (with descriptions)
+    5: 360, // Process description textarea
+  }
+  
+  // Update content height based on current step
+  useEffect(() => {
+    if (embed) return
+    
+    if (result || exitMessage) {
+      // Results and exit screens use max height with internal scroll
+      setContentHeight(540)
+      return
+    }
+    
+    const targetHeight = stepHeights[currentStep] || 400
+    setContentHeight(targetHeight)
+  }, [currentStep, embed, result, exitMessage])
 
   // Check if content is scrollable for scroll indicator
   useEffect(() => {
@@ -244,9 +284,11 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
     setShowScrollIndicator(false)
   }
 
-  const containerHeight = embed 
-    ? 'h-[500px] max-h-[70vh] min-h-[400px]' 
-    : 'h-[600px] max-h-[80vh] min-h-[450px]'
+  // For embedded: fixed height to show all of step 0
+  // For page: dynamic height based on step
+  const isResultsOrExit = result || exitMessage
+  const headerHeight = 52 // Header + progress bar height
+  const animatedHeight = contentHeight + headerHeight
 
   // Render current step content
   const renderStep = () => {
@@ -585,8 +627,81 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
     }
   }
 
+  // Embedded version: fixed height to show all of step 0
+  if (embed) {
+    return (
+      <div className="flex flex-col h-[520px] w-full max-w-2xl mx-auto bg-background rounded-xl border border-foreground/[0.06] overflow-hidden">
+        {/* Header with progress */}
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-foreground/[0.06] flex-shrink-0">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              {!result && (
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              )}
+              <span className="text-sm font-medium text-foreground">ROI Calculator</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {result && (
+                <div className="flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 text-foreground">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                  </svg>
+                  <span className="text-sm font-medium text-foreground">Done</span>
+                </div>
+              )}
+              {!isNodewaveDomain && (
+                <a 
+                  href="https://www.nodewave.io" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Powered by Node Wave
+                </a>
+              )}
+            </div>
+          </div>
+          {/* Progress bar */}
+          <div className="h-1 w-full bg-foreground/[0.06] rounded-full overflow-hidden">
+            {result ? (
+              <div className="h-full w-full bg-primary rounded-full" />
+            ) : !exitMessage && (
+              <motion.div 
+                className="h-full bg-primary rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={exitMessage ? 'exit' : result ? 'result' : currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="h-full"
+            >
+              {renderStep()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    )
+  }
+
+  // Page version: dynamic height with animation
   return (
-    <div className={`flex flex-col ${containerHeight} w-full max-w-2xl mx-auto bg-background rounded-xl border border-foreground/[0.06] overflow-hidden`}>
+    <motion.div 
+      className="flex flex-col w-full max-w-2xl mx-auto bg-background rounded-xl border border-foreground/[0.06] overflow-hidden"
+      animate={{ height: animatedHeight }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+    >
       {/* Header with progress */}
       <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-foreground/[0.06] flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
@@ -605,19 +720,9 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
                 <span className="text-sm font-medium text-foreground">Done</span>
               </div>
             )}
-            {embed && (
-              <a 
-                href="https://www.nodewave.io" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs text-muted-foreground hover:text-primary transition-colors"
-              >
-                Powered by Node Wave
-              </a>
-            )}
           </div>
         </div>
-        {/* Progress bar - always reserve space */}
+        {/* Progress bar */}
         <div className="h-1 w-full bg-foreground/[0.06] rounded-full overflow-hidden">
           {result ? (
             <div className="h-full w-full bg-primary rounded-full" />
@@ -633,7 +738,7 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden">
+      <div ref={contentRef} className={isResultsOrExit ? "flex-1 overflow-hidden" : ""}>
         <AnimatePresence mode="wait">
           <motion.div
             key={exitMessage ? 'exit' : result ? 'result' : currentStep}
@@ -641,13 +746,13 @@ export function ROICalculator({ embed = false }: { embed?: boolean }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="h-full"
+            className={isResultsOrExit ? "h-full" : ""}
           >
             {renderStep()}
           </motion.div>
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
