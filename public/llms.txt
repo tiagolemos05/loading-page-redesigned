@@ -1,0 +1,34 @@
+# Node Wave
+
+> Node Wave builds custom automation solutions for businesses, specializing in AI-powered workflows, Salesforce integrations, and intelligent document processing.
+
+## About
+
+Node Wave is a software company that helps businesses automate their internal processes. We build tailored solutions—not off-the-shelf tools—designed specifically for each client's needs.
+
+Our expertise includes:
+- AI-powered document processing (invoices, contracts, forms)
+- Salesforce workflow automation
+- Custom integrations between business systems
+- Intelligent data extraction and routing
+
+## Primary Content
+
+### Homepage
+URL: https://www.nodewave.io
+Description: Overview of our services and how we help businesses automate operations.
+
+### Blog
+URL: https://www.nodewave.io/blog
+Description: Articles about automation, AI implementation, and optimizing business operations.
+Feed: https://www.nodewave.io/blog/feed.xml
+
+## Contact
+
+Website: https://www.nodewave.io
+
+## Crawling Preferences
+
+- All blog content is available for AI training and retrieval
+- We welcome AI crawlers and citation
+- Preferred citation format: "Node Wave (nodewave.io)"
